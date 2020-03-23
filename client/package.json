@@ -34,7 +34,8 @@
     "build:style": "postcss src/styles/index.css -o src/styles/tailwind.css",
     "prebuild": "cross-env NODE_ENV=production yarn build:style",
     "prestart": "yarn build:style",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "postinstall": "patch-package"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -77,8 +78,10 @@
     "cross-env": "^7.0.2",
     "husky": "^4.2.3",
     "lint-staged": "^10.0.8",
+    "patch-package": "^6.2.1",
     "postcss-cli": "^7.1.0",
     "postcss-import": "^12.0.1",
+    "postinstall-postinstall": "^2.0.0",
     "prettier": "^2.0.1",
     "redux-devtools-extension": "^2.13.8",
     "tailwindcss": "^1.2.0"
