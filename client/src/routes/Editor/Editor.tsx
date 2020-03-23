@@ -1,12 +1,12 @@
 import React, { useMemo, useState } from "react";
-import { createEditor } from "slate";
+import { createEditor, Node } from "slate";
 import { Slate, Editable, withReact } from "slate-react";
 
 interface Props {}
 
 const Editor: React.FC<Props> = () => {
   const editor = useMemo(() => withReact(createEditor()), []);
-  const [value, setValue] = useState([
+  const [value, setValue] = useState<Node[]>([
     {
       type: "paragraph",
       children: [{ text: "A line of text in a paragraph." }]
@@ -18,7 +18,7 @@ const Editor: React.FC<Props> = () => {
       <Slate
         editor={editor}
         value={value}
-        onChange={(value: any) => setValue(value)}
+        onChange={(value: Node[]) => setValue(value)}
       >
         <Editable
           style={{
