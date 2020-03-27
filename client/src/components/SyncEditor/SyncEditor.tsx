@@ -25,13 +25,19 @@ const SyncEditor: React.FC<Props> = ({ className, initialValue = [] }) => {
 
   const handleChange = (value: Node[]) => {
     setValue(value);
-    socket.emit("changeEditor", { value, id: now.current });
+    const anySyncOperation = editor.operations.some(({ type }) => {
+      // @ts-ignore
+      return !(type === "set_selection" || type === "set_value");
+    });
+    if (anySyncOperation) {
+      socket.emit("changeEditor", { value, id: now.current });
+    }
   };
 
   useEffect(() => {
     fetch(`${SERVER}/editor/init`)
       .then((r) => r.json())
-      .then(handleChange);
+      .then((value) => setValue(value));
   }, []);
 
   useEffect(() => {

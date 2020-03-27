@@ -11,8 +11,7 @@ app.use(
 );
 
 io.on("connection", function(socket) {
-  console.log("a user connected");
-  socket.on("changeEditor", data => {
+  socket.on("changeEditor", (data) => {
     io.emit("updateEditor", data);
   });
 });
