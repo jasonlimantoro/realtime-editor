@@ -15,35 +15,39 @@ const socket = io(SERVER);
 
 interface Props {
   className: string;
+  editorId: string;
   initialValue?: string;
 }
 
 interface SocketData {
   value: RawDraftContentState;
   id: string;
+  editorId: string;
 }
 
-const SyncEditor: React.FC<Props> = ({ className, initialValue = "" }) => {
+const SyncEditor: React.FC<Props> = ({
+  className,
+  initialValue = "",
+  editorId,
+}) => {
   const [editorState, setEditorState] = React.useState(
     EditorState.createWithContent(ContentState.createFromText(initialValue))
   );
-  const conn = useRef("");
+  const conn = useRef(String(Date.now()));
 
   useEffect(() => {
-    socket.on("connect", () => {
-      conn.current = socket.id;
-    });
-  }, []);
-
-  useEffect(() => {
-    fetch(`${SERVER}/editor/init`)
+    fetch(`${SERVER}/editor/${editorId}/init`)
       .then((r) => r.json())
       .then((value) => {
-        return setEditorState(
-          EditorState.createWithContent(ContentState.createFromText(value))
-        );
+        if (typeof value === "string") {
+          setEditorState(
+            EditorState.createWithContent(ContentState.createFromText(value))
+          );
+        } else {
+          setEditorState(EditorState.createWithContent(convertFromRaw(value)));
+        }
       });
-  }, []);
+  }, [editorId]);
 
   const handleChange = (editorState: EditorState) => {
     setEditorState(editorState);
@@ -51,19 +55,21 @@ const SyncEditor: React.FC<Props> = ({ className, initialValue = "" }) => {
     socket.emit("changeEditor", {
       value: raw,
       id: conn.current,
+      editorId: editorId,
     });
   };
 
   useEffect(() => {
-    socket.on("updateEditor", ({ value, id }: SocketData) => {
+    const updateEditorEvent = `updateEditor-${editorId}`;
+    socket.on(updateEditorEvent, ({ value, id }: SocketData) => {
       if (id !== conn.current) {
         setEditorState(EditorState.createWithContent(convertFromRaw(value)));
       }
     });
     return () => {
-      socket.off("updateEditor");
+      socket.off(updateEditorEvent);
     };
-  }, []);
+  }, [editorId]);
 
   return (
     <div className={className}>

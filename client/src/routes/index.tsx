@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 import Todos from "./Todos";
 import Editor from "./Editor";
 
@@ -9,7 +9,12 @@ const Index: React.FC<Props> = () => {
   return (
     <Router>
       <Route path="/todos" component={Todos} />
-      <Route path="/editor" component={Editor} />
+      <Route
+        exact
+        path="/editor"
+        render={() => <Redirect to={`/editor/${Date.now()}`} />}
+      />
+      <Route path="/editor/:editorId" component={Editor} />
     </Router>
   );
 };

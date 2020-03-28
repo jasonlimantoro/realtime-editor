@@ -10,18 +10,21 @@ app.use(
   })
 );
 
+const db = {};
+
 io.on("connection", function(socket) {
   socket.on("changeEditor", (data) => {
-    io.emit("updateEditor", data);
+    db[data.editorId] = data.value;
+    io.emit(`updateEditor-${data.editorId}`, data);
   });
 });
 
 app.get("/", (req, res) => res.send("Hello World!"));
 
-const initialValue = "";
+const initialValue = "A paragraph from server";
 
-app.get("/editor/init", (_req, res) => {
-  res.json(initialValue);
+app.get("/editor/:editorId/init", (req, res) => {
+  res.json(db[req.params.editorId] || initialValue);
 });
 
 http.listen(port, () => console.log(`Example app listening on port ${port}!`));
