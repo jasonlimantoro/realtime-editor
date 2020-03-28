@@ -8,6 +8,7 @@ import {
   convertFromRaw,
   RawDraftContentState,
 } from "draft-js";
+
 const SERVER_HOST = "localhost";
 const SERVER_PORT = 4000;
 const SERVER = `http://${SERVER_HOST}:${SERVER_PORT}`;
@@ -55,7 +56,7 @@ const SyncEditor: React.FC<Props> = ({
     socket.emit("changeEditor", {
       value: raw,
       id: conn.current,
-      editorId: editorId,
+      editorId,
     });
   };
 
