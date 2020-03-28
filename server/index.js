@@ -18,12 +18,7 @@ io.on("connection", function(socket) {
 
 app.get("/", (req, res) => res.send("Hello World!"));
 
-const initialValue = [
-  {
-    type: "paragraph",
-    children: [{ text: "A line of text in a paragraph from server" }]
-  }
-];
+const initialValue = "";
 
 app.get("/editor/init", (_req, res) => {
   res.json(initialValue);
