@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import io from "socket.io-client";
 import "draft-js/dist/Draft.css";
 import {
@@ -24,7 +24,6 @@ interface Props {
 
 interface SocketData {
   value: RawDraftContentState;
-  id: string;
   editorId: string;
 }
 
@@ -36,7 +35,6 @@ const SyncEditor: React.FC<Props> = ({
   const [editorState, setEditorState] = React.useState(
     EditorState.createWithContent(ContentState.createFromText(initialValue))
   );
-  const conn = useRef(String(Date.now()));
 
   useEffect(() => {
     fetch(`${SERVER}/editor/${editorId}/init`)
@@ -50,6 +48,7 @@ const SyncEditor: React.FC<Props> = ({
           setEditorState(EditorState.createWithContent(convertFromRaw(value)));
         }
       });
+    socket.emit("create", editorId);
   }, [editorId]);
 
   const handleChange = (editorState: EditorState) => {
@@ -57,7 +56,6 @@ const SyncEditor: React.FC<Props> = ({
     const raw = convertToRaw(editorState.getCurrentContent());
     socket.emit("changeEditor", {
       value: raw,
-      id: conn.current,
       editorId,
     });
   };
@@ -69,14 +67,11 @@ const SyncEditor: React.FC<Props> = ({
   };
 
   useEffect(() => {
-    const updateEditorEvent = `updateEditor-${editorId}`;
-    socket.on(updateEditorEvent, ({ value, id }: SocketData) => {
-      if (id !== conn.current) {
-        setEditorState(EditorState.createWithContent(convertFromRaw(value)));
-      }
+    socket.on("updateEditor", ({ value }: SocketData) => {
+      setEditorState(EditorState.createWithContent(convertFromRaw(value)));
     });
     return () => {
-      socket.off(updateEditorEvent);
+      socket.off("updateEditor");
     };
   }, [editorId]);
 

@@ -3,30 +3,8 @@ const cors = require("cors");
 const http = require("http").createServer(app);
 const io = require("socket.io")(http);
 const port = 4000;
-const mongoose = require("mongoose");
-
-const url = "mongodb://127.0.0.1:27017/editor";
-
-mongoose.connect(url, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useFindAndModify: false
-});
-const mongo = mongoose.connection;
-
-mongo.once("open", () => {
-  console.log("Database connected:", url);
-});
-
-mongo.on("error", (err) => {
-  console.error("connection error:", err);
-});
-
-const draftSchema = new mongoose.Schema(
-  { value: String, editorId: String, _id: Number },
-  { _id: false }
-);
-const Draft = mongoose.model("drafts", draftSchema);
+const { Draft } = require("./database/schema");
+require("./database");
 
 app.use(
   cors({
@@ -35,13 +13,16 @@ app.use(
 );
 
 io.on("connection", function(socket) {
+  socket.on("create", (room) => {
+    socket.join(room);
+  });
   socket.on("changeEditor", async (data) => {
     await Draft.findByIdAndUpdate(
       data.editorId,
-      { value: JSON.stringify(data.value) },
+      { value: data.value },
       { upsert: true }
     );
-    io.emit(`updateEditor-${data.editorId}`, data);
+    socket.broadcast.to(data.editorId).emit("updateEditor", data);
   });
 });
 
@@ -51,7 +32,7 @@ const initialValue = "A paragraph from server";
 
 app.get("/editor/:editorId/init", async (req, res) => {
   const draft = await Draft.findById(req.params.editorId);
-  res.json(draft ? JSON.parse(draft.value) : initialValue);
+  res.json(draft ? draft.value : initialValue);
 });
 
 http.listen(port, () => console.log(`Example app listening on port ${port}!`));
