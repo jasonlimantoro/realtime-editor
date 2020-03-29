@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import io from "socket.io-client";
+import "draft-js/dist/Draft.css";
 import {
   Editor,
   EditorState,
@@ -7,6 +8,7 @@ import {
   convertToRaw,
   convertFromRaw,
   RawDraftContentState,
+  RichUtils,
 } from "draft-js";
 
 const SERVER_HOST = "localhost";
@@ -59,6 +61,12 @@ const SyncEditor: React.FC<Props> = ({
       editorId,
     });
   };
+  const handleBold = () => {
+    handleChange(RichUtils.toggleInlineStyle(editorState, "BOLD"));
+  };
+  const handleItalic = () => {
+    handleChange(RichUtils.toggleInlineStyle(editorState, "ITALIC"));
+  };
 
   useEffect(() => {
     const updateEditorEvent = `updateEditor-${editorId}`;
@@ -74,6 +82,14 @@ const SyncEditor: React.FC<Props> = ({
 
   return (
     <div className={className}>
+      <div className="flex">
+        <button className="mr-4 btn btn-gray" onClick={handleBold}>
+          B
+        </button>
+        <button onClick={handleItalic} className="mr-4 btn btn-gray">
+          I
+        </button>
+      </div>
       <Editor editorState={editorState} onChange={handleChange} />
     </div>
   );
