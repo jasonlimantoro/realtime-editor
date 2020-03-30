@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const model = mongoose.model;
 
 const draftSchema = new Schema(
-  { value: Object, _id: String },
+  { value: Object, title: { type: String, default: "Untitled" }, _id: String },
   { versionKey: false }
 );
 

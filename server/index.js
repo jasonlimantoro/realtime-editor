@@ -2,9 +2,10 @@ const app = require("express")();
 const cors = require("cors");
 const http = require("http").createServer(app);
 const io = require("socket.io")(http);
-const port = 4000;
 const { Draft } = require("./database/schema");
 require("./database");
+
+const port = 4000;
 
 app.use(
   cors({
@@ -20,24 +21,33 @@ io.on("connection", function(socket) {
     await Draft.findByIdAndUpdate(
       data.editorId,
       { value: data.value },
-      { upsert: true }
+      { upsert: true, setDefaultsOnInsert: true }
     );
     socket.broadcast.to(data.editorId).emit("updateEditor", data);
+  });
+
+  socket.on("changeTitle", async (data) => {
+    await Draft.findByIdAndUpdate(
+      data.editorId,
+      { title: data.title },
+      { upsert: true, setDefaultsOnInsert: true }
+    );
+    socket.broadcast.to(data.editorId).emit("updateTitle", data);
   });
 });
 
 app.get("/", (req, res) => res.send("Hello World!"));
 
-const initialValue = "A paragraph from server";
-
 app.get("/editors", async (req, res) => {
-  const drafts = await Draft.find({}, { _id: 1 });
+  const drafts = await Draft.find({}, { _id: 1, title: 1 })
+    .sort({ _id: -1 })
+    .lean();
   res.json(drafts);
 });
 
-app.get("/editor/:editorId/init", async (req, res) => {
-  const draft = await Draft.findById(req.params.editorId);
-  res.json(draft ? draft.value : initialValue);
+app.get("/editor/:editorId", async (req, res) => {
+  const draft = await Draft.findById(req.params.editorId).lean();
+  res.json(draft);
 });
 
 app.delete("/editor/:editorId", async (req, res) => {

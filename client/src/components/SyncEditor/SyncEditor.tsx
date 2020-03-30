@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, useState } from "react";
 import io from "socket.io-client";
 import "draft-js/dist/Draft.css";
 import {
@@ -11,6 +11,13 @@ import {
   RichUtils,
 } from "draft-js";
 import throttle from "lodash/throttle";
+import DraftService from "src/modules/draft/service";
+import config from "src/lib/config";
+import { DraftSchema } from "src/lib/entities/draft";
+
+const service = new DraftService({
+  baseUrl: config.SERVER_HOST,
+});
 
 const SERVER_HOST = "localhost";
 const SERVER_PORT = 4000;
@@ -28,6 +35,10 @@ interface SocketData {
   editorId: string;
 }
 
+interface UpdateTitleSocketData {
+  title: string;
+}
+
 const SyncEditor: React.FC<Props> = ({
   className,
   initialValue = "",
@@ -36,28 +47,43 @@ const SyncEditor: React.FC<Props> = ({
   const [editorState, setEditorState] = React.useState(
     EditorState.createWithContent(ContentState.createFromText(initialValue))
   );
-  const save = (editorState: EditorState) => {
+  const [, setDraft] = React.useState<DraftSchema>();
+
+  const [title, setTitle] = useState("");
+  const saveEditor = (editorState: EditorState) => {
     const raw = convertToRaw(editorState.getCurrentContent());
     socket.emit("changeEditor", {
       value: raw,
       editorId,
     });
   };
+  const saveTitle = (title: string) => {
+    socket.emit("changeTitle", {
+      editorId,
+      title,
+    });
+  };
 
-  const throttledSave = useCallback(throttle(save, 500), []);
+  const throttledSave = useCallback(throttle(saveEditor, 500), [editorId]);
+  const throttledSaveTitle = useCallback(throttle(saveTitle, 500), [editorId]);
 
   useEffect(() => {
-    fetch(`${SERVER}/editor/${editorId}/init`)
-      .then((r) => r.json())
-      .then((value) => {
-        if (typeof value === "string") {
+    const fetchDetail = async () => {
+      const { data } = await service.detail(editorId);
+      if (data) {
+        if (data.value) {
           setEditorState(
-            EditorState.createWithContent(ContentState.createFromText(value))
+            EditorState.createWithContent(convertFromRaw(data.value))
           );
-        } else {
-          setEditorState(EditorState.createWithContent(convertFromRaw(value)));
         }
-      });
+        setDraft(data);
+        setTitle(data.title);
+      }
+    };
+    fetchDetail();
+  }, [editorId]);
+
+  useEffect(() => {
     socket.emit("create", editorId);
   }, [editorId]);
 
@@ -69,22 +95,22 @@ const SyncEditor: React.FC<Props> = ({
   const handleBold = () => {
     const state = RichUtils.toggleInlineStyle(editorState, "BOLD");
     handleChange(state);
-    save(state);
+    saveEditor(state);
   };
   const handleItalic = () => {
     const state = RichUtils.toggleInlineStyle(editorState, "ITALIC");
     handleChange(state);
-    save(state);
+    saveEditor(state);
   };
   const handleBulletPoints = () => {
     const state = RichUtils.toggleBlockType(editorState, "unordered-list-item");
     handleChange(state);
-    save(state);
+    saveEditor(state);
   };
   const handleNumberedPoints = () => {
     const state = RichUtils.toggleBlockType(editorState, "ordered-list-item");
     handleChange(state);
-    save(state);
+    saveEditor(state);
   };
 
   useEffect(() => {
@@ -94,25 +120,53 @@ const SyncEditor: React.FC<Props> = ({
     return () => {
       socket.off("updateEditor");
     };
-  }, [editorId]);
+  }, []);
+  useEffect(() => {
+    socket.on("updateTitle", ({ title }: UpdateTitleSocketData) => {
+      setTitle(title);
+    });
+    return () => {
+      socket.off("updateTitle");
+    };
+  }, []);
+
+  const handleChangeTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTitle(e.target.value);
+    throttledSaveTitle(e.target.value);
+  };
 
   return (
-    <div className={className}>
-      <div className="flex">
-        <button className="mr-4 btn btn-gray" onClick={handleBold}>
-          B
-        </button>
-        <button onClick={handleItalic} className="mr-4 btn btn-gray">
-          I
-        </button>
-        <button className="mr-4 btn btn-gray" onClick={handleBulletPoints}>
-          Bullet points
-        </button>
-        <button className="mr-4 btn btn-gray" onClick={handleNumberedPoints}>
-          Numbered points
-        </button>
+    <div>
+      <div>
+        <input
+          className="w-full text-2xl"
+          placeholder="Untitled"
+          type="text"
+          value={title}
+          onChange={handleChangeTitle}
+        />
       </div>
-      <Editor editorState={editorState} onChange={handleChange} />
+      <div className={className}>
+        <div className="flex">
+          <button className="mr-4 btn btn-gray" onClick={handleBold}>
+            B
+          </button>
+          <button onClick={handleItalic} className="mr-4 btn btn-gray">
+            I
+          </button>
+          <button className="mr-4 btn btn-gray" onClick={handleBulletPoints}>
+            Bullet points
+          </button>
+          <button className="mr-4 btn btn-gray" onClick={handleNumberedPoints}>
+            Numbered points
+          </button>
+        </div>
+        <Editor
+          placeholder="Enter something amazing"
+          editorState={editorState}
+          onChange={handleChange}
+        />
+      </div>
     </div>
   );
 };

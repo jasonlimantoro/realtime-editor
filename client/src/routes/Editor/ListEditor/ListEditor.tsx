@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import moment from "moment";
+import { DraftSchema } from "src/lib/entities/draft";
+import { ellipsis } from "src/lib/utils";
 
 interface Props {}
 
-interface Draft {
-  _id: string;
-}
-
 const ListEditor: React.FC<Props> = () => {
-  const [editors, setEditors] = useState<Draft[]>([]);
+  const [editors, setEditors] = useState<DraftSchema[]>([]);
   useEffect(() => {
     fetch("http://localhost:4000/editors")
       .then((r) => r.json())
@@ -27,12 +26,15 @@ const ListEditor: React.FC<Props> = () => {
         Add new editor
       </Link>
       <ul className="mt-4">
-        {editors.map((e: Draft) => (
+        {editors.map((e: DraftSchema) => (
           <li key={e._id}>
             <div className="flex">
               <Link className="underline" to={`/editor/${e._id}`}>
-                {e._id}
+                {ellipsis(e.title)}
               </Link>
+              <p className="ml-4">
+                created at {moment(Number(e._id)).format("YYYY-MM-DD hh:mm")}
+              </p>
               <button className="ml-4" onClick={() => handleDelete(e._id)}>
                 Delete
               </button>
