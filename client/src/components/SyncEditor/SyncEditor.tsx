@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import io from "socket.io-client";
 import "draft-js/dist/Draft.css";
 import {
@@ -10,6 +10,7 @@ import {
   RawDraftContentState,
   RichUtils,
 } from "draft-js";
+import throttle from "lodash/throttle";
 
 const SERVER_HOST = "localhost";
 const SERVER_PORT = 4000;
@@ -35,6 +36,15 @@ const SyncEditor: React.FC<Props> = ({
   const [editorState, setEditorState] = React.useState(
     EditorState.createWithContent(ContentState.createFromText(initialValue))
   );
+  const save = (editorState: EditorState) => {
+    const raw = convertToRaw(editorState.getCurrentContent());
+    socket.emit("changeEditor", {
+      value: raw,
+      editorId,
+    });
+  };
+
+  const throttledSave = useCallback(throttle(save, 500), []);
 
   useEffect(() => {
     fetch(`${SERVER}/editor/${editorId}/init`)
@@ -53,17 +63,18 @@ const SyncEditor: React.FC<Props> = ({
 
   const handleChange = (editorState: EditorState) => {
     setEditorState(editorState);
-    const raw = convertToRaw(editorState.getCurrentContent());
-    socket.emit("changeEditor", {
-      value: raw,
-      editorId,
-    });
+    throttledSave(editorState);
   };
+
   const handleBold = () => {
-    handleChange(RichUtils.toggleInlineStyle(editorState, "BOLD"));
+    const state = RichUtils.toggleInlineStyle(editorState, "BOLD");
+    handleChange(state);
+    save(state);
   };
   const handleItalic = () => {
-    handleChange(RichUtils.toggleInlineStyle(editorState, "ITALIC"));
+    const state = RichUtils.toggleInlineStyle(editorState, "ITALIC");
+    handleChange(state);
+    save(state);
   };
 
   useEffect(() => {
