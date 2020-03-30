@@ -17,13 +17,8 @@
     "object-curly-spacing": ["warn", "always"],
     "no-unused-vars": "error",
     "@typescript-eslint/no-unused-vars": "error",
-    "@typescript-eslint/no-explicit-any": [
-      "error",
-      {
-        "ignoreRestArgs": true
-      }
-    ],
     "@typescript-eslint/quotes": "off",
+    "@typescript-eslint/no-explicit-any": "off",
     "max-len": [
       "warn",
       {
@@ -97,6 +92,7 @@
         "td": ["gridcell"]
       }
     ],
-    "arrow-body-style": "off"
+    "arrow-body-style": "off",
+    "no-underscore-dangle": "off"
   }
 }

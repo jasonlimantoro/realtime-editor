@@ -76,6 +76,16 @@ const SyncEditor: React.FC<Props> = ({
     handleChange(state);
     save(state);
   };
+  const handleBulletPoints = () => {
+    const state = RichUtils.toggleBlockType(editorState, "unordered-list-item");
+    handleChange(state);
+    save(state);
+  };
+  const handleNumberedPoints = () => {
+    const state = RichUtils.toggleBlockType(editorState, "ordered-list-item");
+    handleChange(state);
+    save(state);
+  };
 
   useEffect(() => {
     socket.on("updateEditor", ({ value }: SocketData) => {
@@ -94,6 +104,12 @@ const SyncEditor: React.FC<Props> = ({
         </button>
         <button onClick={handleItalic} className="mr-4 btn btn-gray">
           I
+        </button>
+        <button className="mr-4 btn btn-gray" onClick={handleBulletPoints}>
+          Bullet points
+        </button>
+        <button className="mr-4 btn btn-gray" onClick={handleNumberedPoints}>
+          Numbered points
         </button>
       </div>
       <Editor editorState={editorState} onChange={handleChange} />

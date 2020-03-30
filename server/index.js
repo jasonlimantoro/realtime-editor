@@ -30,9 +30,19 @@ app.get("/", (req, res) => res.send("Hello World!"));
 
 const initialValue = "A paragraph from server";
 
+app.get("/editors", async (req, res) => {
+  const drafts = await Draft.find({}, { _id: 1 });
+  res.json(drafts);
+});
+
 app.get("/editor/:editorId/init", async (req, res) => {
   const draft = await Draft.findById(req.params.editorId);
   res.json(draft ? draft.value : initialValue);
+});
+
+app.delete("/editor/:editorId", async (req, res) => {
+  await Draft.findByIdAndRemove(req.params.editorId);
+  res.send("success");
 });
 
 http.listen(port, () => console.log(`Example app listening on port ${port}!`));
