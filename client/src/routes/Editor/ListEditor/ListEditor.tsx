@@ -3,21 +3,22 @@ import { Link } from "react-router-dom";
 import moment from "moment";
 import { DraftSchema } from "src/lib/entities/draft";
 import { ellipsis } from "src/lib/utils";
+import { serviceRegistry } from "src/lib/services/registry";
 
 interface Props {}
+
+const service = serviceRegistry.draft;
 
 const ListEditor: React.FC<Props> = () => {
   const [editors, setEditors] = useState<DraftSchema[]>([]);
   useEffect(() => {
-    fetch("http://localhost:4000/editors")
-      .then((r) => r.json())
-      .then((e) => {
-        setEditors(e);
-      });
+    service.list().then(({ data }) => {
+      setEditors(data);
+    });
   }, []);
   const handleDelete = (id: string) => {
     setEditors((e) => e.filter(({ _id }) => _id !== id));
-    fetch(`http://localhost:4000/editor/${id}`, { method: "delete" });
+    service.destroy(id);
   };
   return (
     <div>

@@ -1,5 +1,4 @@
 import React, { useEffect, useCallback, useState } from "react";
-import io from "socket.io-client";
 import "draft-js/dist/Draft.css";
 import {
   Editor,
@@ -11,18 +10,10 @@ import {
   RichUtils,
 } from "draft-js";
 import throttle from "lodash/throttle";
-import DraftService from "src/modules/draft/service";
-import config from "src/lib/config";
 import { DraftSchema } from "src/lib/entities/draft";
+import { serviceRegistry } from "src/lib/services/registry";
 
-const service = new DraftService({
-  baseUrl: config.SERVER_HOST,
-});
-
-const SERVER_HOST = "localhost";
-const SERVER_PORT = 4000;
-const SERVER = `http://${SERVER_HOST}:${SERVER_PORT}`;
-const socket = io(SERVER);
+const service = serviceRegistry.draft;
 
 interface Props {
   className: string;
@@ -52,13 +43,13 @@ const SyncEditor: React.FC<Props> = ({
   const [title, setTitle] = useState("");
   const saveEditor = (editorState: EditorState) => {
     const raw = convertToRaw(editorState.getCurrentContent());
-    socket.emit("changeEditor", {
+    service.broadcastState({
       value: raw,
       editorId,
     });
   };
   const saveTitle = (title: string) => {
-    socket.emit("changeTitle", {
+    service.broadcastTitle({
       editorId,
       title,
     });
@@ -84,7 +75,7 @@ const SyncEditor: React.FC<Props> = ({
   }, [editorId]);
 
   useEffect(() => {
-    socket.emit("create", editorId);
+    service.createRoom(editorId);
   }, [editorId]);
 
   const handleChange = (editorState: EditorState) => {
@@ -114,19 +105,19 @@ const SyncEditor: React.FC<Props> = ({
   };
 
   useEffect(() => {
-    socket.on("updateEditor", ({ value }: SocketData) => {
+    service.listenState(({ value }: SocketData) => {
       setEditorState(EditorState.createWithContent(convertFromRaw(value)));
     });
     return () => {
-      socket.off("updateEditor");
+      service.unlistenState();
     };
   }, []);
   useEffect(() => {
-    socket.on("updateTitle", ({ title }: UpdateTitleSocketData) => {
+    service.listenTitle(({ title }: UpdateTitleSocketData) => {
       setTitle(title);
     });
     return () => {
-      socket.off("updateTitle");
+      service.unlistenTitle();
     };
   }, []);
 

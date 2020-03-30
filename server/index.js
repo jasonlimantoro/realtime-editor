@@ -14,25 +14,25 @@ app.use(
 );
 
 io.on("connection", function(socket) {
-  socket.on("create", (room) => {
+  socket.on("CREATE_ROOM", (room) => {
     socket.join(room);
   });
-  socket.on("changeEditor", async (data) => {
+  socket.on("CHANGE_STATE", async (data) => {
     await Draft.findByIdAndUpdate(
       data.editorId,
       { value: data.value },
       { upsert: true, setDefaultsOnInsert: true }
     );
-    socket.broadcast.to(data.editorId).emit("updateEditor", data);
+    socket.broadcast.to(data.editorId).emit("CHANGE_STATE_LISTENER", data);
   });
 
-  socket.on("changeTitle", async (data) => {
+  socket.on("CHANGE_TITLE", async (data) => {
     await Draft.findByIdAndUpdate(
       data.editorId,
       { title: data.title },
       { upsert: true, setDefaultsOnInsert: true }
     );
-    socket.broadcast.to(data.editorId).emit("updateTitle", data);
+    socket.broadcast.to(data.editorId).emit("CHANGE_TITLE_LISTENER", data);
   });
 });
 

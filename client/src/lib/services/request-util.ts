@@ -1,4 +1,5 @@
 import axios, { AxiosRequestConfig } from "axios";
+import io from "socket.io-client";
 
 interface RequestParams {
   method?: "get" | "post" | "patch" | "put" | "delete";
@@ -11,9 +12,12 @@ export default class RequestUtilService {
 
   public namespace: String;
 
+  public _io: SocketIOClient.Socket;
+
   constructor({ baseUrl = "", namespace = "" } = {}) {
     this.baseUrl = baseUrl;
     this.namespace = namespace;
+    this._io = io(baseUrl);
   }
 
   getConfig = (): AxiosRequestConfig => ({});
@@ -33,5 +37,17 @@ export default class RequestUtilService {
       case "delete":
         return axios.delete(finalPath, this.getConfig());
     }
+  };
+
+  emit = async (event: string, data: any) => {
+    this._io.emit(event, data);
+  };
+
+  listen = async (event: string, cb = () => {}) => {
+    this._io.on(event, cb);
+  };
+
+  unlisten = async (event: string) => {
+    this._io.off(event);
   };
 }
