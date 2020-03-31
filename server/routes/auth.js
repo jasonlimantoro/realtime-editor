@@ -3,7 +3,7 @@ const { User } = require("../database/schema");
 
 const router = express.Router();
 
-router.post("/register", async (req, res) => {
+router.post("/register", async (req, res, next) => {
   try {
     const user = new User({
       username: req.body.username,
@@ -12,12 +12,11 @@ router.post("/register", async (req, res) => {
     const result = await user.save();
     res.json(result);
   } catch (e) {
-    console.log(e);
-    res.status(500).send(e);
+    next(e);
   }
 });
 
-router.post("/login", async (req, res) => {
+router.post("/login", async (req, res, next) => {
   try {
     const user = await User.findOne({ username: req.body.username });
     if (!user) {
@@ -35,8 +34,7 @@ router.post("/login", async (req, res) => {
       message: "Successfully logged in"
     });
   } catch (e) {
-    console.log(e);
-    res.status(500).send(e);
+    next(e);
   }
 });
 

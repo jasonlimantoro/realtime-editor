@@ -3,6 +3,8 @@ const cors = require("cors");
 const http = require("http");
 const socket = require("socket.io");
 const bodyParser = require("body-parser");
+const morgan = require("morgan");
+
 const { Draft } = require("./database/schema");
 require("./database");
 
@@ -12,6 +14,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socket(server);
 
+app.use(morgan("common"));
 app.use(bodyParser.json());
 app.use(
   cors({
@@ -46,6 +49,12 @@ app.get("/", (req, res) => res.send("Hello World!"));
 
 app.use("/drafts", require("./routes/draft").default);
 app.use("/auth", require("./routes/auth").default);
+
+app.use(function(err, req, res, next) {
+  console.error(err.stack);
+  res.status(500).send(err);
+  next(err);
+});
 
 server.listen(port, () =>
   console.log(`Example app listening on port ${port}!`)
