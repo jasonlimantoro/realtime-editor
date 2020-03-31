@@ -8,3 +8,15 @@ export const ellipsis = (
   }
   return str;
 };
+
+export const tryCatch = (fn: Function) => async ({
+  errorFn = (x: any) => x,
+  successFn = (x: any) => x,
+}) => {
+  try {
+    const res = await fn();
+    successFn(res);
+  } catch (e) {
+    errorFn(e);
+  }
+};

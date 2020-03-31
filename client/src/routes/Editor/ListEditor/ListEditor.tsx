@@ -49,7 +49,7 @@ const ListEditor: React.FC<Props> = () => {
                       {ellipsis(v.title)}
                     </Link>
                     <p className="ml-4">
-                      created at {moment(Number(v._id)).format("hh:mm")}
+                      created at {moment(Number(v._id)).format("HH:mm")}
                     </p>
                     <button
                       className="ml-4"

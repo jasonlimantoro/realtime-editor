@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const http = require("http");
 const socket = require("socket.io");
+const bodyParser = require("body-parser");
 const { Draft } = require("./database/schema");
 require("./database");
 
@@ -11,6 +12,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socket(server);
 
+app.use(bodyParser.json());
 app.use(
   cors({
     origin: "http://localhost:3000"
@@ -43,6 +45,7 @@ io.on("connection", function(socket) {
 app.get("/", (req, res) => res.send("Hello World!"));
 
 app.use("/drafts", require("./routes/draft").default);
+app.use("/auth", require("./routes/auth").default);
 
 server.listen(port, () =>
   console.log(`Example app listening on port ${port}!`)
