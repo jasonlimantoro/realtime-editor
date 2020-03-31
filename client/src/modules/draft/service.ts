@@ -11,12 +11,12 @@ export default class DraftService extends BaseService {
 
   CREATE_ROOM = "CREATE_ROOM";
 
-  list = () => this.requestUtil.request({ path: "editors" });
+  list = () => this.requestUtil.request({ path: "drafts" });
 
-  detail = (id: string) => this.requestUtil.request({ path: `editor/${id}` });
+  detail = (id: string) => this.requestUtil.request({ path: `drafts/${id}` });
 
   destroy = (id: string) =>
-    this.requestUtil.request({ path: `editor/${id}`, method: "delete" });
+    this.requestUtil.request({ path: `drafts/${id}`, method: "delete" });
 
   broadcastTitle = (data: any) =>
     this.requestUtil.emit(this.CHANGE_TITLE, data);

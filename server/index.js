@@ -1,11 +1,15 @@
-const app = require("express")();
+const express = require("express");
 const cors = require("cors");
-const http = require("http").createServer(app);
-const io = require("socket.io")(http);
+const http = require("http");
+const socket = require("socket.io");
 const { Draft } = require("./database/schema");
 require("./database");
 
 const port = 4000;
+
+const app = express();
+const server = http.createServer(app);
+const io = socket(server);
 
 app.use(
   cors({
@@ -38,21 +42,8 @@ io.on("connection", function(socket) {
 
 app.get("/", (req, res) => res.send("Hello World!"));
 
-app.get("/editors", async (req, res) => {
-  const drafts = await Draft.find({}, { _id: 1, title: 1 })
-    .sort({ _id: -1 })
-    .lean();
-  res.json(drafts);
-});
+app.use("/drafts", require("./routes/draft").default);
 
-app.get("/editor/:editorId", async (req, res) => {
-  const draft = await Draft.findById(req.params.editorId).lean();
-  res.json(draft);
-});
-
-app.delete("/editor/:editorId", async (req, res) => {
-  await Draft.findByIdAndRemove(req.params.editorId);
-  res.send("success");
-});
-
-http.listen(port, () => console.log(`Example app listening on port ${port}!`));
+server.listen(port, () =>
+  console.log(`Example app listening on port ${port}!`)
+);
