@@ -8,6 +8,8 @@ export enum AuthActionType {
   REGISTER_BEGIN = "AUTH/REGISTER_BEGIN",
   REGISTER_SUCCESS = "AUTH/REGISTER_SUCCESS",
   REGISTER_FAILURE = "AUTH/REGISTER_FAILURE",
+
+  HYDRATE = "AUTH/HYDRATE",
 }
 
 export interface State {
@@ -51,10 +53,18 @@ export interface RegisterFailure {
   payload: any;
 }
 
+export interface HydrateAction {
+  type: AuthActionType.HYDRATE;
+  payload: {
+    token: string | null;
+  };
+}
+
 export type AuthAction =
   | LoginBegin
   | LoginFailure
   | LoginSuccess
   | RegisterBegin
   | RegisterSuccess
-  | RegisterFailure;
+  | RegisterFailure
+  | HydrateAction;

@@ -9,7 +9,10 @@ const initialState: State = {
   registerError: {},
 
   isLoggedIn: false,
-  credentials: {},
+  credentials: {
+    token: "",
+    username: "",
+  },
 };
 
 const reducer = (state = initialState, action: AuthAction) =>
@@ -21,7 +24,7 @@ const reducer = (state = initialState, action: AuthAction) =>
       case AuthActionType.LOGIN_SUCCESS:
         draft.loginLoading = false;
         draft.isLoggedIn = true;
-        draft.credentials = action.payload.user;
+        draft.credentials = { ...draft.credentials, ...action.payload.user };
         draft.loginError = {};
         break;
       case AuthActionType.LOGIN_FAILURE:
@@ -40,6 +43,12 @@ const reducer = (state = initialState, action: AuthAction) =>
       case AuthActionType.REGISTER_FAILURE:
         draft.registerError = action.payload;
         break;
+      case AuthActionType.HYDRATE: {
+        const { token } = action.payload;
+        draft.isLoggedIn = !!token;
+        draft.credentials.token = token || "";
+        break;
+      }
     }
   });
 

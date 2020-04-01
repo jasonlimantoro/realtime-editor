@@ -1,11 +1,14 @@
 import axios, { AxiosRequestConfig } from "axios";
 import io from "socket.io-client";
+import CustomStorage from "../storage";
 
 interface RequestParams {
   method?: "get" | "post" | "patch" | "put" | "delete";
   path?: string;
   data?: any;
 }
+
+const storage = new CustomStorage();
 
 export default class RequestUtilService {
   public baseUrl: String;
@@ -20,7 +23,17 @@ export default class RequestUtilService {
     this._io = io(baseUrl);
   }
 
-  getConfig = (): AxiosRequestConfig => ({});
+  getConfig = (): AxiosRequestConfig => {
+    const jwt = storage.getToken();
+    if (jwt) {
+      return {
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+        },
+      };
+    }
+    return {};
+  };
 
   // eslint-disable-next-line consistent-return
   request = async ({ method = "get", path = "", data }: RequestParams) => {

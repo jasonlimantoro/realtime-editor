@@ -1,11 +1,21 @@
 import React from "react";
+import { Provider } from "react-redux";
 import Routes from "./routes";
 import configureStore from "./store/configureStore";
-import { Provider } from "react-redux";
+import { AuthActionType } from "./modules/auth/types";
+import CustomStorage from "./lib/storage";
 
 interface Props {}
 
 const store = configureStore();
+const storage = new CustomStorage();
+
+store.dispatch({
+  type: AuthActionType.HYDRATE,
+  payload: {
+    token: storage.getToken(),
+  },
+});
 
 const App: React.FC<Props> = () => {
   return (
