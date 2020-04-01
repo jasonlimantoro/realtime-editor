@@ -5,6 +5,11 @@ const router = express.Router();
 
 router.post("/register", async (req, res, next) => {
   try {
+    if (await User.findOne({ username: req.body.username })) {
+      return res.status(400).json({
+        message: "Username already taken"
+      });
+    }
     const user = new User({
       username: req.body.username,
       password: req.body.password
