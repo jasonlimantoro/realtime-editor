@@ -4,11 +4,21 @@ const { Draft } = require("../database/schema");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-  const drafts = await Draft.find({}, { value: 0 })
+  await Draft.find({}, { value: 0 })
     .sort({ _id: -1 })
-    .populate("author", "-password")
-    .lean();
-  res.json(drafts);
+    .populate({
+      path: "author",
+      select: "-password",
+      match: {
+        _id: {
+          $eq: req.user.sub
+        }
+      }
+    })
+    .exec((_err, d) => {
+      const filtered = d.filter(({ author }) => author !== null);
+      res.json(filtered);
+    });
 });
 
 router.post("/", async (req, res) => {

@@ -59,6 +59,7 @@ const ListEditor: React.FC<Props> = ({ logout }) => {
                     <p className="ml-4">
                       created at {moment(Number(v._id)).format("HH:mm")}
                     </p>
+                    <p className="ml-4">Created by {v.author.username}</p>
                     <button
                       className="ml-4"
                       onClick={() => handleDelete(v._id)}
