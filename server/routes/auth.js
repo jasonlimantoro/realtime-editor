@@ -35,8 +35,12 @@ router.post("/login", async (req, res, next) => {
         message: "Password invalid"
       });
     }
+    const { password: _password, ...userData } = user.toObject({
+      virtuals: true
+    });
     res.json({
-      message: "Successfully logged in"
+      message: "Successfully logged in",
+      user: userData
     });
   } catch (e) {
     next(e);

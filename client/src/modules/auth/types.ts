@@ -1,3 +1,5 @@
+import { User } from "src/lib/entities/User";
+
 export enum AuthActionType {
   LOGIN_BEGIN = "AUTH/LOGIN_BEGIN",
   LOGIN_SUCCESS = "AUTH/LOGIN_SUCCESS",
@@ -24,7 +26,9 @@ export interface LoginBegin {
 
 export interface LoginSuccess {
   type: AuthActionType.LOGIN_SUCCESS;
-  payload: any;
+  payload: {
+    user: User;
+  };
 }
 
 export interface LoginFailure {

@@ -1,12 +1,14 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const config = require("../../lib/config");
 
 const Schema = mongoose.Schema;
 const model = mongoose.model;
 
 const userSchema = new Schema(
   { username: String, email: String, password: String },
-  { versionKey: false }
+  { versionKey: false, id: false }
 );
 
 userSchema.pre("save", async function(next) {
@@ -20,6 +22,9 @@ userSchema.pre("save", async function(next) {
 userSchema.methods.comparePassword = function(plaintext) {
   return bcrypt.compare(plaintext, this.password);
 };
+userSchema.virtual("token").get(function() {
+  return jwt.sign({ sub: this._id }, config.SECRET);
+});
 
 const User = model("users", userSchema);
 

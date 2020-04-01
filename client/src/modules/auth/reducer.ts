@@ -21,7 +21,7 @@ const reducer = (state = initialState, action: AuthAction) =>
       case AuthActionType.LOGIN_SUCCESS:
         draft.loginLoading = false;
         draft.isLoggedIn = true;
-        draft.credentials = action.payload;
+        draft.credentials = action.payload.user;
         draft.loginError = {};
         break;
       case AuthActionType.LOGIN_FAILURE:
