@@ -7,6 +7,7 @@ import { ellipsis } from "src/lib/utils";
 import { serviceRegistry } from "src/lib/services/registry";
 import { AppState } from "src/modules/types";
 import { logout } from "src/modules/auth/action";
+import { selectLoggedInUser } from "src/modules/auth/selector";
 
 interface ListEditorProps {}
 
@@ -14,7 +15,7 @@ type Props = ListEditorProps & LinkMapDispatchProps & LinkMapStateProps;
 
 const service = serviceRegistry.draft;
 
-const ListEditor: React.FC<Props> = ({ logout }) => {
+const ListEditor: React.FC<Props> = ({ logout, username }) => {
   const [editors, setEditors] = useState<DraftSchema[]>([]);
   useEffect(() => {
     service.list().then(({ data }) => {
@@ -37,9 +38,10 @@ const ListEditor: React.FC<Props> = ({ logout }) => {
   }, [editors]);
   return (
     <div>
-      <h2 className="text-2xl">List Editor ({editors.length})</h2>
+      <h2 className="text-3xl">Welcome {username}!</h2>
+      <h2 className="text-xl">Total Drafts ({editors.length})</h2>
       <Link className="inline-block btn btn-gray" to="/editor">
-        Add new editor
+        Add new draft
       </Link>
       <button className="btn" onClick={() => logout()}>
         Logout
@@ -77,13 +79,17 @@ const ListEditor: React.FC<Props> = ({ logout }) => {
   );
 };
 
-interface LinkMapStateProps {}
+interface LinkMapStateProps {
+  username: string;
+}
 
 interface LinkMapDispatchProps {
   logout: () => void;
 }
 
-const mapStateToProps = (_state: AppState): LinkMapStateProps => ({});
+const mapStateToProps = (state: AppState): LinkMapStateProps => ({
+  username: selectLoggedInUser(state),
+});
 
 const mapDispatchToProps: LinkMapDispatchProps = {
   logout,

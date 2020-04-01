@@ -16,7 +16,7 @@ export enum AuthActionType {
 
 export interface State {
   isLoggedIn: boolean;
-  credentials: any;
+  credentials: User;
   loginLoading: boolean;
   loginError: any;
   registerLoading: boolean;

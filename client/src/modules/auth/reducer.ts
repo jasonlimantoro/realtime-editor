@@ -30,7 +30,10 @@ const reducer = (state = initialState, action: AuthAction) =>
       case AuthActionType.LOGIN_FAILURE:
         draft.loginLoading = false;
         draft.loginError = action.payload;
-        draft.credentials = {};
+        draft.credentials = {
+          username: "",
+          token: "",
+        };
         break;
 
       case AuthActionType.REGISTER_BEGIN:
@@ -46,7 +49,10 @@ const reducer = (state = initialState, action: AuthAction) =>
 
       case AuthActionType.LOGOUT:
         draft.isLoggedIn = false;
-        draft.credentials = {};
+        draft.credentials = {
+          username: "",
+          token: "",
+        };
         break;
 
       case AuthActionType.HYDRATE: {
