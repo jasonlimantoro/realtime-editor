@@ -18,6 +18,9 @@ export default class DraftService extends BaseService {
   destroy = (id: string) =>
     this.requestUtil.request({ path: `drafts/${id}`, method: "delete" });
 
+  create = (body: any) =>
+    this.requestUtil.request({ method: "post", path: "drafts", data: body });
+
   broadcastTitle = (data: any) =>
     this.requestUtil.emit(this.CHANGE_TITLE, data);
 

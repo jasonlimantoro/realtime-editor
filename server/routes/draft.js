@@ -10,6 +10,15 @@ router.get("/", async (req, res) => {
   res.json(drafts);
 });
 
+router.post("/", async (req, res) => {
+  const exisiting = await Draft.findById(req.body.id);
+  if (!exisiting) {
+  const draft = new Draft({ _id: req.body.id, author: req.user.sub });
+  const result = await draft.save();
+    return res.json(result);
+  }
+  res.status(204).send({});
+});
 router.get("/:draftId", async (req, res) => {
   const draft = await Draft.findById(req.params.draftId).lean();
   res.json(draft);
