@@ -35,7 +35,6 @@ app.use(
     origin: "http://localhost:3000"
   })
 );
-// app.use(jwt());
 
 io.on("connection", function(socket) {
   socket.on("CREATE_ROOM", (room) => {
@@ -65,11 +64,26 @@ app.get("/", (req, res) => res.send("Hello World!"));
 app.use("/drafts", jwt(), require("./routes/draft").default);
 app.use("/auth", require("./routes/auth").default);
 
-app.use(function(err, req, res, next) {
-  console.error(err.stack);
-  res.status(500).send(err);
-  next(err);
-});
+const errorHandler = (err, req, res, _next) => {
+  if (typeof err === "string") {
+    // custom application error
+    return res.status(400).json({ message: err });
+  }
+
+  if (err.name === "ValidationError") {
+    // mongoose validation error
+    return res.status(400).json({ message: err.message });
+  }
+
+  if (err.name === "UnauthorizedError") {
+    // jwt authentication error
+    return res.status(401).json({ message: "Invalid Token" });
+  }
+
+  // default to 500 server error
+  return res.status(500).json({ message: err.message });
+};
+app.use(errorHandler);
 
 server.listen(port, () =>
   console.log(`Example app listening on port ${port}!`)
