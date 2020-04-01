@@ -4,8 +4,9 @@ const { Draft } = require("../database/schema");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-  const drafts = await Draft.find()
+  const drafts = await Draft.find({}, { value: 0 })
     .sort({ _id: -1 })
+    .populate("author", "-password")
     .lean();
   res.json(drafts);
 });
@@ -13,8 +14,8 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
   const exisiting = await Draft.findById(req.body.id);
   if (!exisiting) {
-  const draft = new Draft({ _id: req.body.id, author: req.user.sub });
-  const result = await draft.save();
+    const draft = new Draft({ _id: req.body.id, author: req.user.sub });
+    const result = await draft.save();
     return res.json(result);
   }
   res.status(204).send({});
