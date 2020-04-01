@@ -65,8 +65,6 @@ export const hydrate = (): HydrateAction => {
   const credentials = storage.getCredentials();
   return {
     type: AuthActionType.HYDRATE,
-    payload: {
-      token: credentials && credentials.token,
-    },
+    payload: credentials,
   };
 };

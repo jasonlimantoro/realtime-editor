@@ -57,9 +57,7 @@ export interface RegisterFailure {
 
 export interface HydrateAction {
   type: AuthActionType.HYDRATE;
-  payload: {
-    token: string | null;
-  };
+  payload: User;
 }
 
 export interface LogoutAction {

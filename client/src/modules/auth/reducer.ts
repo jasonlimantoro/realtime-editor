@@ -50,9 +50,11 @@ const reducer = (state = initialState, action: AuthAction) =>
         break;
 
       case AuthActionType.HYDRATE: {
-        const { token } = action.payload;
-        draft.isLoggedIn = !!token;
-        draft.credentials.token = token || "";
+        const credentials = action.payload;
+        if (credentials) {
+          draft.isLoggedIn = true;
+          draft.credentials = credentials;
+        }
         break;
       }
     }
