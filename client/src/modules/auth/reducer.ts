@@ -43,6 +43,12 @@ const reducer = (state = initialState, action: AuthAction) =>
       case AuthActionType.REGISTER_FAILURE:
         draft.registerError = action.payload;
         break;
+
+      case AuthActionType.LOGOUT:
+        draft.isLoggedIn = false;
+        draft.credentials = {};
+        break;
+
       case AuthActionType.HYDRATE: {
         const { token } = action.payload;
         draft.isLoggedIn = !!token;

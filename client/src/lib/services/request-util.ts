@@ -24,11 +24,11 @@ export default class RequestUtilService {
   }
 
   getConfig = (): AxiosRequestConfig => {
-    const jwt = storage.getToken();
-    if (jwt) {
+    const credential = storage.getCredentials();
+    if (credential) {
       return {
         headers: {
-          Authorization: `Bearer ${jwt}`,
+          Authorization: `Bearer ${credential.token}`,
         },
       };
     }

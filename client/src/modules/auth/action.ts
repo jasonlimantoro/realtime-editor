@@ -2,7 +2,7 @@ import { tryCatch } from "src/lib/utils";
 import { Dispatch } from "redux";
 import { serviceRegistry } from "src/lib/services/registry";
 import CustomStorage from "src/lib/storage";
-import { AuthActionType } from "./types";
+import { AuthActionType, HydrateAction, LogoutAction } from "./types";
 
 const service = serviceRegistry.auth;
 const storage = new CustomStorage();
@@ -20,7 +20,7 @@ export const login = (username: string, password: string) => async (
         type: AuthActionType.LOGIN_SUCCESS,
         payload: response.data,
       });
-      storage.saveToken(response.data.user.token);
+      storage.saveCredentials(response.data.user);
     },
     errorFn(err) {
       dispatch({
@@ -52,4 +52,21 @@ export const register = (username: string, password: string) => async (
       });
     },
   });
+};
+
+export const logout = (): LogoutAction => {
+  storage.flushCredentials();
+  return {
+    type: AuthActionType.LOGOUT,
+  };
+};
+
+export const hydrate = (): HydrateAction => {
+  const credentials = storage.getCredentials();
+  return {
+    type: AuthActionType.HYDRATE,
+    payload: {
+      token: credentials && credentials.token,
+    },
+  };
 };

@@ -9,6 +9,8 @@ export enum AuthActionType {
   REGISTER_SUCCESS = "AUTH/REGISTER_SUCCESS",
   REGISTER_FAILURE = "AUTH/REGISTER_FAILURE",
 
+  LOGOUT = "AUTH/LOGOUT",
+
   HYDRATE = "AUTH/HYDRATE",
 }
 
@@ -60,6 +62,10 @@ export interface HydrateAction {
   };
 }
 
+export interface LogoutAction {
+  type: AuthActionType.LOGOUT;
+}
+
 export type AuthAction =
   | LoginBegin
   | LoginFailure
@@ -67,4 +73,5 @@ export type AuthAction =
   | RegisterBegin
   | RegisterSuccess
   | RegisterFailure
-  | HydrateAction;
+  | HydrateAction
+  | LogoutAction;

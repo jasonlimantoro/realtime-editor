@@ -16,6 +16,7 @@
   "rules": {
     "object-curly-spacing": ["warn", "always"],
     "no-unused-vars": "error",
+    "no-empty": "off",
     "@typescript-eslint/no-unused-vars": "error",
     "@typescript-eslint/quotes": "off",
     "@typescript-eslint/no-explicit-any": "off",

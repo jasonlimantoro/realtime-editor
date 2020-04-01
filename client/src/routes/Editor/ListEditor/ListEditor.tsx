@@ -1,15 +1,20 @@
 import React, { useEffect, useState, useMemo } from "react";
+import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import moment from "moment";
 import { DraftSchema } from "src/lib/entities/draft";
 import { ellipsis } from "src/lib/utils";
 import { serviceRegistry } from "src/lib/services/registry";
+import { AppState } from "src/modules/types";
+import { logout } from "src/modules/auth/action";
 
-interface Props {}
+interface ListEditorProps {}
+
+type Props = ListEditorProps & LinkMapDispatchProps & LinkMapStateProps;
 
 const service = serviceRegistry.draft;
 
-const ListEditor: React.FC<Props> = () => {
+const ListEditor: React.FC<Props> = ({ logout }) => {
   const [editors, setEditors] = useState<DraftSchema[]>([]);
   useEffect(() => {
     service.list().then(({ data }) => {
@@ -36,6 +41,9 @@ const ListEditor: React.FC<Props> = () => {
       <Link className="inline-block btn btn-gray" to="/editor">
         Add new editor
       </Link>
+      <button className="btn" onClick={() => logout()}>
+        Logout
+      </button>
       {Object.keys(groupByDate).map((k) => {
         const value = groupByDate[k];
         return (
@@ -68,4 +76,15 @@ const ListEditor: React.FC<Props> = () => {
   );
 };
 
-export default ListEditor;
+interface LinkMapStateProps {}
+
+interface LinkMapDispatchProps {
+  logout: () => void;
+}
+
+const mapStateToProps = (_state: AppState): LinkMapStateProps => ({});
+
+const mapDispatchToProps: LinkMapDispatchProps = {
+  logout,
+};
+export default connect(mapStateToProps, mapDispatchToProps)(ListEditor);
