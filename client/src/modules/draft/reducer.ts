@@ -12,6 +12,8 @@ const initialState: State = {
   detailError: {},
   deleteLoading: false,
   deleteError: {},
+  subscribeLoading: false,
+  subscribeError: {},
 };
 
 const reducer = (state = initialState, action: DraftAction) =>
@@ -40,6 +42,8 @@ const reducer = (state = initialState, action: DraftAction) =>
           );
           if (idx === -1) {
             draft.drafts.push(action.payload);
+          } else {
+            draft.drafts[idx] = action.payload;
           }
         }
         break;
