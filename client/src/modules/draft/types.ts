@@ -24,9 +24,6 @@ export enum DraftActionTypes {
   SET_BEGIN = "DRAFT/SET_BEGIN",
   SET_SUCCESS = "DRAFT/SET_SUCCESS",
   SET_FAILURE = "DRAFT/SET_FAILURE",
-  LIST_BEGIN = "DRAFT/LIST_BEGIN",
-  LIST_SUCCESS = "DRAFT/LIST_SUCCESS",
-  LIST_FAILURE = "DRAFT/LIST_FAILURE",
 }
 
 export interface ListBeginAction {
@@ -65,10 +62,60 @@ export interface DeleteFailureAction {
   payload: any;
 }
 
+export interface DetailBeginAction {
+  type: DraftActionTypes.SET_BEGIN;
+  scope: Scope.detail;
+  payload: any;
+}
+
+export interface DetailSuccessAction {
+  type: DraftActionTypes.SET_SUCCESS;
+  scope: Scope.detail;
+  payload: DraftSchema;
+}
+
+export interface DetailFailureAction {
+  type: DraftActionTypes.SET_FAILURE;
+  scope: Scope.detail;
+  payload: any;
+}
+
+export interface CreateBeginAction {
+  type: DraftActionTypes.SET_BEGIN;
+  scope: Scope.create;
+  payload: any;
+}
+
+export interface CreateSuccessAction {
+  type: DraftActionTypes.SET_SUCCESS;
+  scope: Scope.create;
+  payload: DraftSchema;
+}
+
+export interface CreateFailureAction {
+  type: DraftActionTypes.SET_FAILURE;
+  scope: Scope.create;
+  payload: any;
+}
+
 type ListAction = ListBeginAction | ListSuccessAction | ListFailureAction;
 type DeleteAction =
   | DeleteBeginAction
   | DeleteSuccessAction
   | DeleteFailureAction;
 
-export type DraftAction = ListAction | DeleteAction;
+type CreateAction =
+  | CreateBeginAction
+  | CreateSuccessAction
+  | CreateFailureAction;
+
+type DetailAction =
+  | DetailBeginAction
+  | DetailSuccessAction
+  | DetailFailureAction;
+
+export type DraftAction =
+  | ListAction
+  | DeleteAction
+  | CreateAction
+  | DetailAction;

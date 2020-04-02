@@ -52,3 +52,51 @@ export const remove = (id: string) => async (dispatch: Dispatch) => {
     },
   });
 };
+
+export const create = (body: any) => async (dispatch: Dispatch) => {
+  dispatch({
+    type: DraftActionTypes.SET_BEGIN,
+    scope: Scope.create,
+    payload: body,
+  });
+  await tryCatch(() => service.create(body))({
+    successFn(resp) {
+      dispatch({
+        type: DraftActionTypes.SET_SUCCESS,
+        payload: resp.data,
+        scope: Scope.create,
+      });
+    },
+    errorFn(err) {
+      dispatch({
+        type: DraftActionTypes.SET_FAILURE,
+        payload: err.response,
+        scope: Scope.create,
+      });
+    },
+  });
+};
+
+export const detail = (id: string) => async (dispatch: Dispatch) => {
+  dispatch({
+    type: DraftActionTypes.SET_BEGIN,
+    scope: Scope.detail,
+    payload: id,
+  });
+  await tryCatch(() => service.detail(id))({
+    successFn(resp) {
+      dispatch({
+        type: DraftActionTypes.SET_SUCCESS,
+        payload: resp.data,
+        scope: Scope.detail,
+      });
+    },
+    errorFn(err) {
+      dispatch({
+        type: DraftActionTypes.SET_FAILURE,
+        payload: err.response,
+        scope: Scope.detail,
+      });
+    },
+  });
+};

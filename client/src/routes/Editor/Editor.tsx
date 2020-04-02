@@ -1,17 +1,19 @@
 import React, { useEffect } from "react";
+import { connect } from "react-redux";
 import SyncEditor from "src/components/SyncEditor";
 import { useParams, Link } from "react-router-dom";
-import { serviceRegistry } from "src/lib/services/registry";
+import { AppState } from "src/modules/types";
+import { create } from "src/modules/draft/action";
 
-interface Props {}
+interface EditorProps {}
 
-const service = serviceRegistry.draft;
+type Props = EditorProps & LinkMapStateProps & LinkMapDispatchProps;
 
-const Editor: React.FC<Props> = () => {
+const Editor: React.FC<Props> = ({ create }) => {
   const { editorId } = useParams<{ editorId: string }>();
   useEffect(() => {
-    service.create({ id: editorId });
-  }, [editorId]);
+    create({ id: editorId });
+  }, [create, editorId]);
   return (
     <div className="p-8">
       <Link className="underline" to="/editors">
@@ -22,4 +24,15 @@ const Editor: React.FC<Props> = () => {
   );
 };
 
-export default Editor;
+interface LinkMapStateProps {}
+
+interface LinkMapDispatchProps {
+  create: (body: any) => void;
+}
+
+const mapStateToProps = (_state: AppState): LinkMapStateProps => ({});
+
+const mapDispatchToProps: LinkMapDispatchProps = {
+  create,
+};
+export default connect(mapStateToProps, mapDispatchToProps)(Editor);

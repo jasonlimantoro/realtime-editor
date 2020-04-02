@@ -1,4 +1,5 @@
 import produce from "immer";
+import isEmpty from "lodash/isEmpty";
 import { State, DraftAction, DraftActionTypes, Scope } from "./types";
 
 const initialState: State = {
@@ -29,6 +30,17 @@ const reducer = (state = initialState, action: DraftAction) =>
             draft.drafts.findIndex(({ _id: id }) => id === action.payload.id),
             1
           );
+        } else if (action.scope === Scope.create) {
+          if (!isEmpty(action.payload)) {
+            draft.drafts.push(action.payload);
+          }
+        } else if (action.scope === Scope.detail) {
+          const idx = draft.drafts.findIndex(
+            ({ _id }) => _id === action.payload._id
+          );
+          if (idx === -1) {
+            draft.drafts.push(action.payload);
+          }
         }
         break;
 

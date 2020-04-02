@@ -1,4 +1,5 @@
 import React, { useEffect, useCallback, useState } from "react";
+import { connect, ConnectedProps } from "react-redux";
 import "draft-js/dist/Draft.css";
 import {
   Editor,
@@ -10,16 +11,12 @@ import {
   RichUtils,
 } from "draft-js";
 import throttle from "lodash/throttle";
-import { DraftSchema } from "src/lib/entities/draft";
+import { detail } from "src/modules/draft/action";
 import { serviceRegistry } from "src/lib/services/registry";
+import { selectDraftById } from "src/modules/draft/selector";
+import { AppState } from "src/modules/types";
 
 const service = serviceRegistry.draft;
-
-interface Props {
-  className: string;
-  editorId: string;
-  initialValue?: string;
-}
 
 interface SocketData {
   value: RawDraftContentState;
@@ -30,16 +27,22 @@ interface UpdateTitleSocketData {
   title: string;
 }
 
+interface Props extends PropsFromRedux {
+  className: string;
+  editorId: string;
+  initialValue?: string;
+}
+
 const SyncEditor: React.FC<Props> = ({
   className,
   initialValue = "",
   editorId,
+  detail,
+  draft,
 }) => {
   const [editorState, setEditorState] = React.useState(
     EditorState.createWithContent(ContentState.createFromText(initialValue))
   );
-  const [, setDraft] = React.useState<DraftSchema>();
-
   const [title, setTitle] = useState("");
   const saveEditor = (editorState: EditorState) => {
     const raw = convertToRaw(editorState.getCurrentContent());
@@ -59,21 +62,19 @@ const SyncEditor: React.FC<Props> = ({
   const throttledSaveTitle = useCallback(throttle(saveTitle, 500), [editorId]);
 
   useEffect(() => {
-    const fetchDetail = async () => {
-      const { data } = await service.detail(editorId);
-      if (data) {
-        if (data.value) {
-          setEditorState(
-            EditorState.createWithContent(convertFromRaw(data.value))
-          );
-        }
-        setDraft(data);
-        setTitle(data.title);
+    if (draft) {
+      if (draft.value) {
+        setEditorState(
+          EditorState.createWithContent(convertFromRaw(draft.value))
+        );
       }
-    };
-    fetchDetail();
-  }, [editorId]);
+      setTitle(draft.title);
+    }
+  }, [editorId, draft]);
 
+  useEffect(() => {
+    detail(editorId);
+  }, [detail, editorId]);
   useEffect(() => {
     service.createRoom(editorId);
   }, [editorId]);
@@ -162,4 +163,19 @@ const SyncEditor: React.FC<Props> = ({
   );
 };
 
-export default SyncEditor;
+const mapStateToProps = (
+  state: AppState,
+  { editorId }: { editorId: string }
+) => ({
+  draft: selectDraftById(state, { id: editorId }),
+});
+
+const mapDispatchToProps = {
+  detail,
+};
+
+const connector = connect(mapStateToProps, mapDispatchToProps);
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+export default connector(SyncEditor);
