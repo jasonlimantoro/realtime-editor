@@ -35,7 +35,7 @@ router.post("/login", async (req, res, next) => {
         message: "Password invalid"
       });
     }
-    const { password: _password, ...userData } = user.toObject({
+    const { password: _password, _id, ...userData } = user.toObject({
       virtuals: true
     });
     res.json({
