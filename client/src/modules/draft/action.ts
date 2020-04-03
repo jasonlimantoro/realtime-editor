@@ -9,6 +9,8 @@ import {
   BroadcastSuccess,
   BroadcastError,
   ClearEditing,
+  EditingTitle,
+  EditingValue,
 } from "./types";
 
 const service = serviceRegistry.draft;
@@ -188,4 +190,14 @@ export const unlisten = ({ field = "value" }): Unlisten => {
 
 export const clearEditingValue = (): ClearEditing => ({
   type: DraftActionTypes.CLEAR_EDITING_STATE,
+});
+
+export const setEditingTitle = (title: string): EditingTitle => ({
+  type: DraftActionTypes.SET_EDITING_TITLE,
+  payload: title,
+});
+
+export const setEditingValue = (value: any): EditingValue => ({
+  type: DraftActionTypes.SET_EDITING_VALUE,
+  payload: value,
 });

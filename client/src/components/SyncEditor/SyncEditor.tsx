@@ -1,14 +1,7 @@
-import React, { useEffect, useCallback, useState } from "react";
+import React, { useEffect, useCallback } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import "draft-js/dist/Draft.css";
-import {
-  Editor,
-  EditorState,
-  ContentState,
-  convertToRaw,
-  convertFromRaw,
-  RichUtils,
-} from "draft-js";
+import { Editor, EditorState, convertToRaw, RichUtils } from "draft-js";
 import throttle from "lodash/throttle";
 import {
   detail,
@@ -16,6 +9,8 @@ import {
   listen,
   unlisten,
   clearEditingValue,
+  setEditingTitle,
+  setEditingValue,
 } from "src/modules/draft/action";
 import {
   selectDraftById,
@@ -27,26 +22,30 @@ import { AppState } from "src/modules/types";
 interface Props extends PropsFromRedux {
   className: string;
   editorId: string;
-  initialValue?: string;
 }
+
+/**
+ * Need to maintain the current SelectionState
+ * No need to store it in internal state to bypass the additional rendering
+ * Reference:
+ * - https://github.com/facebook/draft-js/issues/700
+ * - https://caffeinecoding.com/react-redux-draftjs/
+ */
+let localEditorState = EditorState.createEmpty();
 
 const SyncEditor: React.FC<Props> = ({
   className,
-  initialValue = "",
   editorId,
   detail,
-  draft,
   broadcast,
   editingTitle,
   editingValue,
   listen,
   unlisten,
   clearEditingValue,
+  setEditingTitle,
+  setEditingValue,
 }) => {
-  const [editorState, setEditorState] = React.useState(
-    EditorState.createWithContent(ContentState.createFromText(initialValue))
-  );
-  const [title, setTitle] = useState("");
   const saveEditor = (editorState: EditorState) => {
     const raw = convertToRaw(editorState.getCurrentContent());
     broadcast({
@@ -71,17 +70,6 @@ const SyncEditor: React.FC<Props> = ({
   const throttledSaveTitle = useCallback(throttle(saveTitle, 500), [editorId]);
 
   useEffect(() => {
-    if (draft) {
-      if (draft.value) {
-        setEditorState(
-          EditorState.createWithContent(convertFromRaw(draft.value))
-        );
-      }
-      setTitle(draft.title);
-    }
-  }, [editorId, draft]);
-
-  useEffect(() => {
     detail(editorId);
   }, [detail, editorId]);
   useEffect(() => {
@@ -89,27 +77,31 @@ const SyncEditor: React.FC<Props> = ({
   }, [editorId, broadcast]);
 
   const handleChange = (editorState: EditorState) => {
-    setEditorState(editorState);
+    localEditorState = editorState;
+    setEditingValue(convertToRaw(editorState.getCurrentContent()));
     throttledSave(editorState);
   };
 
   const handleBold = () => {
-    const state = RichUtils.toggleInlineStyle(editorState, "BOLD");
+    const state = RichUtils.toggleInlineStyle(editingValue, "BOLD");
     handleChange(state);
     saveEditor(state);
   };
   const handleItalic = () => {
-    const state = RichUtils.toggleInlineStyle(editorState, "ITALIC");
+    const state = RichUtils.toggleInlineStyle(editingValue, "ITALIC");
     handleChange(state);
     saveEditor(state);
   };
   const handleBulletPoints = () => {
-    const state = RichUtils.toggleBlockType(editorState, "unordered-list-item");
+    const state = RichUtils.toggleBlockType(
+      editingValue,
+      "unordered-list-item"
+    );
     handleChange(state);
     saveEditor(state);
   };
   const handleNumberedPoints = () => {
-    const state = RichUtils.toggleBlockType(editorState, "ordered-list-item");
+    const state = RichUtils.toggleBlockType(editingValue, "ordered-list-item");
     handleChange(state);
     saveEditor(state);
   };
@@ -122,14 +114,6 @@ const SyncEditor: React.FC<Props> = ({
       unlisten({ field: "value" });
     };
   }, [listen, unlisten]);
-  useEffect(() => {
-    if (editingValue) {
-      setEditorState(
-        EditorState.createWithContent(convertFromRaw(editingValue))
-      );
-    }
-    setTitle(editingTitle);
-  }, [editingValue, editingTitle]);
 
   useEffect(() => {
     return () => {
@@ -137,7 +121,7 @@ const SyncEditor: React.FC<Props> = ({
     };
   }, [clearEditingValue]);
   const handleChangeTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTitle(e.target.value);
+    setEditingTitle(e.target.value);
     throttledSaveTitle(e.target.value);
   };
 
@@ -148,7 +132,7 @@ const SyncEditor: React.FC<Props> = ({
           className="w-full text-2xl"
           placeholder="Untitled"
           type="text"
-          value={title}
+          value={editingTitle}
           onChange={handleChangeTitle}
         />
       </div>
@@ -169,7 +153,10 @@ const SyncEditor: React.FC<Props> = ({
         </div>
         <Editor
           placeholder="Enter something amazing"
-          editorState={editorState}
+          editorState={EditorState.acceptSelection(
+            editingValue,
+            localEditorState.getSelection()
+          )}
           onChange={handleChange}
         />
       </div>
@@ -192,6 +179,8 @@ const mapDispatchToProps = {
   listen,
   unlisten,
   clearEditingValue,
+  setEditingTitle,
+  setEditingValue,
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);

@@ -1,6 +1,7 @@
 import { createSelector } from "reselect";
 import moment from "moment";
 import { AppState } from "src/modules/types";
+import { EditorState, convertFromRaw } from "draft-js";
 
 const selectDrafts = (state: AppState) => state.draft.drafts;
 const selectEditing = (state: AppState) => state.draft.editing;
@@ -39,7 +40,9 @@ export const selectEditingTitle = createSelector(
   (state) => state.title
 );
 
-export const selectEditingValue = createSelector(
-  selectEditing,
-  (state) => state.value
-);
+export const selectEditingValue = createSelector(selectEditing, (state) => {
+  if (!state.value) {
+    return EditorState.createEmpty();
+  }
+  return EditorState.createWithContent(convertFromRaw(state.value));
+});
