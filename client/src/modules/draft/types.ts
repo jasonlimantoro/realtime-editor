@@ -10,6 +10,12 @@ export interface State {
   detailError: {};
   deleteLoading: boolean;
   deleteError: {};
+  broadcastLoading: boolean;
+  broadcastError: {};
+  editing: {
+    title: string;
+    value: any;
+  };
   [key: string]: any;
 }
 
@@ -18,12 +24,18 @@ export enum Scope {
   create = "create",
   detail = "detail",
   delete = "delete",
+  broadcast = "broadcast",
 }
 
 export enum DraftActionTypes {
   SET_BEGIN = "DRAFT/SET_BEGIN",
   SET_SUCCESS = "DRAFT/SET_SUCCESS",
   SET_FAILURE = "DRAFT/SET_FAILURE",
+
+  SET_EDITING_TITLE = "DRAFT/SET_EDITING_TITLE",
+  SET_EDITING_VALUE = "DRAFT/SET_EDITING_VALUE",
+
+  UNLISTEN = "DRAFT/UNLISTEN",
 }
 
 export interface ListBeginAction {
@@ -98,6 +110,41 @@ export interface CreateFailureAction {
   payload: any;
 }
 
+export interface BroadcastBegin {
+  type: DraftActionTypes.SET_BEGIN;
+  scope: Scope.broadcast;
+  event: string;
+  payload: any;
+}
+
+export interface BroadcastSuccess {
+  type: DraftActionTypes.SET_SUCCESS;
+  scope: Scope.broadcast;
+  event: string;
+}
+
+export interface BroadcastError {
+  type: DraftActionTypes.SET_FAILURE;
+  scope: Scope.broadcast;
+  event: string;
+  payload: any;
+}
+
+export interface EditingTitle {
+  type: DraftActionTypes.SET_EDITING_TITLE;
+  payload: string;
+}
+
+export interface EditingValue {
+  type: DraftActionTypes.SET_EDITING_VALUE;
+  payload: any;
+}
+
+export interface Unlisten {
+  type: DraftActionTypes.UNLISTEN;
+  event: string;
+}
+
 type ListAction = ListBeginAction | ListSuccessAction | ListFailureAction;
 type DeleteAction =
   | DeleteBeginAction
@@ -114,8 +161,17 @@ type DetailAction =
   | DetailSuccessAction
   | DetailFailureAction;
 
+type BroadcastAction = BroadcastBegin | BroadcastSuccess | BroadcastError;
+
+type EditingAction = EditingTitle | EditingValue;
+
+type UnlistenAction = Unlisten;
+
 export type DraftAction =
   | ListAction
   | DeleteAction
   | CreateAction
-  | DetailAction;
+  | DetailAction
+  | BroadcastAction
+  | EditingAction
+  | UnlistenAction;

@@ -7,25 +7,16 @@ import {
   ContentState,
   convertToRaw,
   convertFromRaw,
-  RawDraftContentState,
   RichUtils,
 } from "draft-js";
 import throttle from "lodash/throttle";
-import { detail } from "src/modules/draft/action";
-import { serviceRegistry } from "src/lib/services/registry";
-import { selectDraftById } from "src/modules/draft/selector";
+import { detail, broadcast, listen, unlisten } from "src/modules/draft/action";
+import {
+  selectDraftById,
+  selectEditingTitle,
+  selectEditingValue,
+} from "src/modules/draft/selector";
 import { AppState } from "src/modules/types";
-
-const service = serviceRegistry.draft;
-
-interface SocketData {
-  value: RawDraftContentState;
-  editorId: string;
-}
-
-interface UpdateTitleSocketData {
-  title: string;
-}
 
 interface Props extends PropsFromRedux {
   className: string;
@@ -39,6 +30,11 @@ const SyncEditor: React.FC<Props> = ({
   editorId,
   detail,
   draft,
+  broadcast,
+  editingTitle,
+  editingValue,
+  listen,
+  unlisten,
 }) => {
   const [editorState, setEditorState] = React.useState(
     EditorState.createWithContent(ContentState.createFromText(initialValue))
@@ -46,15 +42,21 @@ const SyncEditor: React.FC<Props> = ({
   const [title, setTitle] = useState("");
   const saveEditor = (editorState: EditorState) => {
     const raw = convertToRaw(editorState.getCurrentContent());
-    service.broadcastState({
-      value: raw,
-      editorId,
+    broadcast({
+      field: "value",
+      data: {
+        value: raw,
+        editorId,
+      },
     });
   };
   const saveTitle = (title: string) => {
-    service.broadcastTitle({
-      editorId,
-      title,
+    broadcast({
+      field: "title",
+      data: {
+        editorId,
+        title,
+      },
     });
   };
 
@@ -76,8 +78,8 @@ const SyncEditor: React.FC<Props> = ({
     detail(editorId);
   }, [detail, editorId]);
   useEffect(() => {
-    service.createRoom(editorId);
-  }, [editorId]);
+    broadcast({ field: "room", data: editorId });
+  }, [editorId, broadcast]);
 
   const handleChange = (editorState: EditorState) => {
     setEditorState(editorState);
@@ -106,21 +108,21 @@ const SyncEditor: React.FC<Props> = ({
   };
 
   useEffect(() => {
-    service.listenState(({ value }: SocketData) => {
-      setEditorState(EditorState.createWithContent(convertFromRaw(value)));
-    });
+    listen({ field: "title" });
+    listen({ field: "value" });
     return () => {
-      service.unlistenState();
+      unlisten({ field: "title" });
+      unlisten({ field: "value" });
     };
-  }, []);
+  }, [listen, unlisten]);
   useEffect(() => {
-    service.listenTitle(({ title }: UpdateTitleSocketData) => {
-      setTitle(title);
-    });
-    return () => {
-      service.unlistenTitle();
-    };
-  }, []);
+    if (editingValue) {
+      setEditorState(
+        EditorState.createWithContent(convertFromRaw(editingValue))
+      );
+    }
+    setTitle(editingTitle);
+  }, [editingValue, editingTitle]);
 
   const handleChangeTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
@@ -168,10 +170,15 @@ const mapStateToProps = (
   { editorId }: { editorId: string }
 ) => ({
   draft: selectDraftById(state, { id: editorId }),
+  editingTitle: selectEditingTitle(state),
+  editingValue: selectEditingValue(state),
 });
 
 const mapDispatchToProps = {
   detail,
+  broadcast,
+  listen,
+  unlisten,
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);

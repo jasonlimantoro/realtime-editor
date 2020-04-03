@@ -3,6 +3,7 @@ import moment from "moment";
 import { AppState } from "src/modules/types";
 
 const selectDrafts = (state: AppState) => state.draft.drafts;
+const selectEditing = (state: AppState) => state.draft.editing;
 
 const selectDraftsWithProps = (state: AppState, _props: any) =>
   selectDrafts(state);
@@ -31,4 +32,14 @@ export const selectDraftById = createSelector(
     const draft = state.find(({ _id }) => _id === id);
     return draft!;
   }
+);
+
+export const selectEditingTitle = createSelector(
+  selectEditing,
+  (state) => state.title
+);
+
+export const selectEditingValue = createSelector(
+  selectEditing,
+  (state) => state.value
 );

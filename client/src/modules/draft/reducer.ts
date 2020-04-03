@@ -1,6 +1,15 @@
 import produce from "immer";
 import isEmpty from "lodash/isEmpty";
-import { State, DraftAction, DraftActionTypes, Scope } from "./types";
+import {
+  State,
+  DraftAction,
+  DraftActionTypes,
+  Scope,
+  ListSuccessAction,
+  CreateSuccessAction,
+  DeleteSuccessAction,
+  DetailSuccessAction,
+} from "./types";
 
 const initialState: State = {
   drafts: [],
@@ -12,10 +21,53 @@ const initialState: State = {
   detailError: {},
   deleteLoading: false,
   deleteError: {},
-  subscribeLoading: false,
-  subscribeError: {},
+  broadcastLoading: false,
+  broadcastError: {},
+  editing: {
+    title: "",
+    value: "",
+  },
 };
 
+type SuccessAction =
+  | ListSuccessAction
+  | CreateSuccessAction
+  | DeleteSuccessAction
+  | DetailSuccessAction;
+
+const successReducer = (state = initialState, action: SuccessAction) => {
+  switch (action.scope) {
+    case Scope.list:
+      state.drafts = action.payload;
+      break;
+
+    case Scope.create:
+      if (!isEmpty(action.payload)) {
+        state.drafts.push(action.payload);
+      }
+      break;
+
+    case Scope.delete:
+      state.drafts.splice(
+        state.drafts.findIndex(({ _id: id }) => id === action.payload.id),
+        1
+      );
+      break;
+
+    case Scope.detail: {
+      const idx = state.drafts.findIndex(
+        ({ _id }) => _id === action.payload._id
+      );
+      if (idx === -1) {
+        state.drafts.push(action.payload);
+      } else {
+        state.drafts[idx] = action.payload;
+      }
+      state.editing.title = action.payload.title;
+      state.editing.value = action.payload.value;
+    }
+  }
+};
 const reducer = (state = initialState, action: DraftAction) =>
   produce(state, (draft) => {
     switch (action.type) {
@@ -25,32 +77,20 @@ const reducer = (state = initialState, action: DraftAction) =>
       case DraftActionTypes.SET_SUCCESS:
         draft[`${action.scope}Loading`] = false;
         draft[`${action.scope}Error`] = {};
-        if (action.scope === Scope.list) {
-          draft.drafts = action.payload;
-        } else if (action.scope === Scope.delete) {
-          draft.drafts.splice(
-            draft.drafts.findIndex(({ _id: id }) => id === action.payload.id),
-            1
-          );
-        } else if (action.scope === Scope.create) {
-          if (!isEmpty(action.payload)) {
-            draft.drafts.push(action.payload);
-          }
-        } else if (action.scope === Scope.detail) {
-          const idx = draft.drafts.findIndex(
-            ({ _id }) => _id === action.payload._id
-          );
-          if (idx === -1) {
-            draft.drafts.push(action.payload);
-          } else {
-            draft.drafts[idx] = action.payload;
-          }
-        }
+        successReducer(draft, action as SuccessAction);
         break;
 
       case DraftActionTypes.SET_FAILURE:
         draft[`${action.scope}Loading`] = false;
         draft[`${action.scope}Error`] = action.payload;
+        break;
+
+      case DraftActionTypes.SET_EDITING_TITLE:
+        draft.editing.title = action.payload;
+        break;
+
+      case DraftActionTypes.SET_EDITING_VALUE:
+        draft.editing.value = action.payload;
         break;
     }
   });

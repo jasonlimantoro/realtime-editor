@@ -1,7 +1,14 @@
 import { serviceRegistry } from "src/lib/services/registry";
 import { Dispatch } from "redux";
 import { tryCatch } from "src/lib/utils";
-import { DraftActionTypes, Scope } from "./types";
+import {
+  DraftActionTypes,
+  Scope,
+  Unlisten,
+  BroadcastBegin,
+  BroadcastSuccess,
+  BroadcastError,
+} from "./types";
 
 const service = serviceRegistry.draft;
 
@@ -99,4 +106,81 @@ export const detail = (id: string) => async (dispatch: Dispatch) => {
       });
     },
   });
+};
+
+const fieldToEventName: { [key: string]: string } = {
+  value: service.CHANGE_STATE,
+  title: service.CHANGE_TITLE,
+  room: service.CREATE_ROOM,
+};
+
+export const broadcast = ({
+  field = "value",
+  data,
+}: {
+  field: string;
+  data: any;
+}) => {
+  const broadcaster: { [key: string]: Function } = {
+    value: service.broadcastState,
+    title: service.broadcastTitle,
+    room: service.createRoom,
+  };
+
+  return async (dispatch: Dispatch) => {
+    dispatch<BroadcastBegin>({
+      type: DraftActionTypes.SET_BEGIN,
+      scope: Scope.broadcast,
+      event: fieldToEventName[field],
+      payload: data,
+    });
+    await tryCatch(() => broadcaster[field](data))({
+      successFn() {
+        dispatch<BroadcastSuccess>({
+          type: DraftActionTypes.SET_SUCCESS,
+          scope: Scope.broadcast,
+          event: fieldToEventName[field],
+        });
+      },
+      errorFn(err) {
+        dispatch<BroadcastError>({
+          type: DraftActionTypes.SET_FAILURE,
+          scope: Scope.broadcast,
+          event: fieldToEventName[field],
+          payload: err,
+        });
+      },
+    });
+  };
+};
+
+export const listen = ({ field = "value" }) => {
+  const listener: { [key: string]: Function } = {
+    title: service.listenTitle,
+    value: service.listenState,
+  };
+  const fieldToActionType: { [key: string]: string } = {
+    title: DraftActionTypes.SET_EDITING_TITLE,
+    value: DraftActionTypes.SET_EDITING_VALUE,
+  };
+  return async (dispatch: Dispatch) => {
+    listener[field]((data: any) => {
+      dispatch({
+        type: fieldToActionType[field],
+        payload: data[field],
+      });
+    });
+  };
+};
+
+export const unlisten = ({ field = "value" }): Unlisten => {
+  const unlistener: { [key: string]: Function } = {
+    title: service.unlistenTitle,
+    value: service.unlistenTitle,
+  };
+  unlistener[field]();
+  return {
+    type: DraftActionTypes.UNLISTEN,
+    event: fieldToEventName[field],
+  };
 };
