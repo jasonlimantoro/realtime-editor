@@ -23,7 +23,7 @@ userSchema.methods.comparePassword = function(plaintext) {
   return bcrypt.compare(plaintext, this.password);
 };
 userSchema.virtual("token").get(function() {
-  return jwt.sign({ sub: this._id }, config.SECRET);
+  return jwt.sign({ sub: this._id }, config.SECRET, { expiresIn: "15m" });
 });
 
 const User = model("users", userSchema);

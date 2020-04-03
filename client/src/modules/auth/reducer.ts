@@ -13,6 +13,7 @@ const initialState: State = {
     token: "",
     username: "",
   },
+  logoutReason: "",
 };
 
 const reducer = (state = initialState, action: AuthAction) =>
@@ -26,6 +27,7 @@ const reducer = (state = initialState, action: AuthAction) =>
         draft.isLoggedIn = true;
         draft.credentials = { ...draft.credentials, ...action.payload.user };
         draft.loginError = {};
+        draft.logoutReason = "";
         break;
       case AuthActionType.LOGIN_FAILURE:
         draft.loginLoading = false;
@@ -53,6 +55,7 @@ const reducer = (state = initialState, action: AuthAction) =>
           username: "",
           token: "",
         };
+        draft.logoutReason = action.payload.reason;
         break;
 
       case AuthActionType.HYDRATE: {

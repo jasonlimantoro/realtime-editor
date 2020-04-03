@@ -65,6 +65,7 @@ app.use("/drafts", jwt(), require("./routes/draft").default);
 app.use("/auth", require("./routes/auth").default);
 
 const errorHandler = (err, req, res, _next) => {
+  console.error(err);
   if (typeof err === "string") {
     // custom application error
     return res.status(400).json({ message: err });
@@ -77,11 +78,17 @@ const errorHandler = (err, req, res, _next) => {
 
   if (err.name === "UnauthorizedError") {
     // jwt authentication error
-    return res.status(401).json({ message: "Invalid Token" });
+    if (err.inner.name === "TokenExpiredError") {
+      return res
+        .status(401)
+        .json({ message: "Token expired", code: "token_expired" });
+    }
+    return res
+      .status(401)
+      .json({ message: "Invalid Token", code: "token_invalid" });
   }
 
   // default to 500 server error
-  console.error(err);
   return res.status(500).json({ message: err.message });
 };
 app.use(errorHandler);

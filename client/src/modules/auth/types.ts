@@ -21,6 +21,7 @@ export interface State {
   loginError: any;
   registerLoading: boolean;
   registerError: any;
+  logoutReason: string;
 }
 
 export interface LoginBegin {
@@ -62,6 +63,9 @@ export interface HydrateAction {
 
 export interface LogoutAction {
   type: AuthActionType.LOGOUT;
+  payload: {
+    reason: string;
+  };
 }
 
 export type AuthAction =

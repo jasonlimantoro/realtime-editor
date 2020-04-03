@@ -54,10 +54,13 @@ export const register = (username: string, password: string) => async (
   });
 };
 
-export const logout = (): LogoutAction => {
+export const logout = ({ reason = "user initiated" } = {}): LogoutAction => {
   storage.flushCredentials();
   return {
     type: AuthActionType.LOGOUT,
+    payload: {
+      reason,
+    },
   };
 };
 

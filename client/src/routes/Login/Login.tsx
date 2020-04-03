@@ -3,14 +3,16 @@ import { connect } from "react-redux";
 import { login } from "src/modules/auth/action";
 import { Formik, Form, Field } from "formik";
 import { AppState } from "src/modules/types";
+import { selectLogoutReason } from "src/modules/auth/selector";
 
 interface LoginProps {}
 
 type Props = LoginProps & LinkMapStateProps & LinkMapDispatchProps;
 
-const Login: React.FC<Props> = ({ login }) => {
+const Login: React.FC<Props> = ({ login, logoutReason }) => {
   return (
     <div>
+      {logoutReason && <p className="text-red-500">Reason: {logoutReason}</p>}
       Login
       <Formik
         onSubmit={(values) => login(values.username, values.password)}
@@ -36,13 +38,17 @@ const Login: React.FC<Props> = ({ login }) => {
   );
 };
 
-interface LinkMapStateProps {}
+interface LinkMapStateProps {
+  logoutReason: string;
+}
 
 interface LinkMapDispatchProps {
   login: (username: string, password: string) => void;
 }
 
-const mapStateToProps = (state: AppState): LinkMapStateProps => ({});
+const mapStateToProps = (state: AppState): LinkMapStateProps => ({
+  logoutReason: selectLogoutReason(state),
+});
 
 const mapDispatchToProps: LinkMapDispatchProps = {
   login,
