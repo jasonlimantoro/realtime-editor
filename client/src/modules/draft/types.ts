@@ -34,6 +34,7 @@ export enum DraftActionTypes {
 
   SET_EDITING_TITLE = "DRAFT/SET_EDITING_TITLE",
   SET_EDITING_VALUE = "DRAFT/SET_EDITING_VALUE",
+  CLEAR_EDITING_STATE = "DRAFT/CLEAR_EDITING_STATE",
 
   UNLISTEN = "DRAFT/UNLISTEN",
 }
@@ -145,6 +146,10 @@ export interface Unlisten {
   event: string;
 }
 
+export interface ClearEditing {
+  type: DraftActionTypes.CLEAR_EDITING_STATE;
+}
+
 type ListAction = ListBeginAction | ListSuccessAction | ListFailureAction;
 type DeleteAction =
   | DeleteBeginAction
@@ -163,7 +168,7 @@ type DetailAction =
 
 type BroadcastAction = BroadcastBegin | BroadcastSuccess | BroadcastError;
 
-type EditingAction = EditingTitle | EditingValue;
+type EditingAction = EditingTitle | EditingValue | ClearEditing;
 
 type UnlistenAction = Unlisten;
 

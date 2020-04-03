@@ -25,7 +25,7 @@ const initialState: State = {
   broadcastError: {},
   editing: {
     title: "",
-    value: "",
+    value: null,
   },
 };
 
@@ -91,6 +91,12 @@ const reducer = (state = initialState, action: DraftAction) =>
 
       case DraftActionTypes.SET_EDITING_VALUE:
         draft.editing.value = action.payload;
+        break;
+      case DraftActionTypes.CLEAR_EDITING_STATE:
+        draft.editing = {
+          value: null,
+          title: "",
+        };
         break;
     }
   });

@@ -8,6 +8,7 @@ import {
   BroadcastBegin,
   BroadcastSuccess,
   BroadcastError,
+  ClearEditing,
 } from "./types";
 
 const service = serviceRegistry.draft;
@@ -184,3 +185,7 @@ export const unlisten = ({ field = "value" }): Unlisten => {
     event: fieldToEventName[field],
   };
 };
+
+export const clearEditingValue = (): ClearEditing => ({
+  type: DraftActionTypes.CLEAR_EDITING_STATE,
+});

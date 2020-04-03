@@ -10,7 +10,13 @@ import {
   RichUtils,
 } from "draft-js";
 import throttle from "lodash/throttle";
-import { detail, broadcast, listen, unlisten } from "src/modules/draft/action";
+import {
+  detail,
+  broadcast,
+  listen,
+  unlisten,
+  clearEditingValue,
+} from "src/modules/draft/action";
 import {
   selectDraftById,
   selectEditingTitle,
@@ -35,6 +41,7 @@ const SyncEditor: React.FC<Props> = ({
   editingValue,
   listen,
   unlisten,
+  clearEditingValue,
 }) => {
   const [editorState, setEditorState] = React.useState(
     EditorState.createWithContent(ContentState.createFromText(initialValue))
@@ -124,6 +131,11 @@ const SyncEditor: React.FC<Props> = ({
     setTitle(editingTitle);
   }, [editingValue, editingTitle]);
 
+  useEffect(() => {
+    return () => {
+      clearEditingValue();
+    };
+  }, [clearEditingValue]);
   const handleChangeTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
     throttledSaveTitle(e.target.value);
@@ -179,6 +191,7 @@ const mapDispatchToProps = {
   broadcast,
   listen,
   unlisten,
+  clearEditingValue,
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
