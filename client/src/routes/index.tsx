@@ -27,7 +27,7 @@ const Index: React.FC<Props> = () => {
           render={() => <Redirect to={`/editor/${Date.now()}`} />}
         />
         <AuthGuard path="/editors" component={ListEditor} />
-        <Route path="/editor/:editorId" component={Editor} />
+        <AuthGuard path="/editor/:editorId" component={Editor} />
         <Route render={() => <h1 className="text-3xl">Not Found</h1>} />
       </Switch>
     </Router>
