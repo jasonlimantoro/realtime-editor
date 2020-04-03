@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+require("express-async-errors");
 const http = require("http");
 const socket = require("socket.io");
 const bodyParser = require("body-parser");
@@ -22,12 +23,17 @@ function jwt() {
 }
 
 async function isRevoked(req, payload, done) {
-  const user = await User.findById(payload.sub);
-  if (!user) {
-    return done(null, true);
+  try {
+    const user = await User.findById(payload.sub);
+    if (!user) {
+      return done(null, true);
+    }
+    done();
+  } catch (e) {
+    done(null, true);
   }
-  done();
 }
+
 app.use(morgan("common"));
 app.use(bodyParser.json());
 app.use(
