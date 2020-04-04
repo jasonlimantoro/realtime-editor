@@ -11,6 +11,8 @@ import {
   clearEditingValue,
   setEditingTitle,
   setEditingValue,
+  listenCollaboratorChange,
+  leave,
 } from "src/modules/draft/action";
 import {
   selectDraftById,
@@ -45,6 +47,8 @@ const SyncEditor: React.FC<Props> = ({
   clearEditingValue,
   setEditingTitle,
   setEditingValue,
+  listenCollaboratorChange,
+  leave,
 }) => {
   const saveEditor = (editorState: EditorState) => {
     const raw = convertToRaw(editorState.getCurrentContent());
@@ -69,6 +73,9 @@ const SyncEditor: React.FC<Props> = ({
   const throttledSave = useCallback(throttle(saveEditor, 500), [editorId]);
   const throttledSaveTitle = useCallback(throttle(saveTitle, 500), [editorId]);
 
+  useEffect(() => {
+    listenCollaboratorChange();
+  }, [listenCollaboratorChange]);
   useEffect(() => {
     detail(editorId);
   }, [detail, editorId]);
@@ -110,16 +117,16 @@ const SyncEditor: React.FC<Props> = ({
     listen({ field: "title" });
     listen({ field: "value" });
     return () => {
-      unlisten({ field: "title" });
-      unlisten({ field: "value" });
+      unlisten();
     };
   }, [listen, unlisten]);
 
   useEffect(() => {
     return () => {
+      leave({ room: editorId });
       clearEditingValue();
     };
-  }, [clearEditingValue]);
+  }, [clearEditingValue, leave, editorId]);
   const handleChangeTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEditingTitle(e.target.value);
     throttledSaveTitle(e.target.value);
@@ -181,6 +188,8 @@ const mapDispatchToProps = {
   clearEditingValue,
   setEditingTitle,
   setEditingValue,
+  listenCollaboratorChange,
+  leave,
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);

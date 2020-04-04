@@ -33,4 +33,8 @@ export default class CustomStorage {
   flushCredentials() {
     this._storage.removeItem(this.STORAGE_KEYS.CRED);
   }
+
+  hasCredentials() {
+    return this.getCredentials() !== null;
+  }
 }

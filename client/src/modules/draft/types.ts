@@ -15,6 +15,7 @@ export interface State {
   editing: {
     title: string;
     value: any;
+    collaborators: any[];
   };
   [key: string]: any;
 }
@@ -36,6 +37,8 @@ export enum DraftActionTypes {
   SET_EDITING_VALUE = "DRAFT/SET_EDITING_VALUE",
   CLEAR_EDITING_STATE = "DRAFT/CLEAR_EDITING_STATE",
 
+  SUBSCRIBE_NEW_COLLABORATOR = "DRAFT/SUBSCRIBE_NEW_COLLABORATOR",
+  SUBSCRIBE_REMOVE_COLLABORATOR = "DRAFT/SUBSCRIBE_REMOVE_COLLABORATOR",
   UNLISTEN = "DRAFT/UNLISTEN",
 }
 
@@ -143,11 +146,25 @@ export interface EditingValue {
 
 export interface Unlisten {
   type: DraftActionTypes.UNLISTEN;
-  event: string;
+  event?: string;
 }
 
 export interface ClearEditing {
   type: DraftActionTypes.CLEAR_EDITING_STATE;
+}
+
+export interface SubscribeNewCollaborator {
+  type: DraftActionTypes.SUBSCRIBE_NEW_COLLABORATOR;
+  payload: {
+    username: string;
+  };
+}
+
+export interface SubscribeRemoveCollaborator {
+  type: DraftActionTypes.SUBSCRIBE_REMOVE_COLLABORATOR;
+  payload: {
+    username: string;
+  };
 }
 
 type ListAction = ListBeginAction | ListSuccessAction | ListFailureAction;
@@ -172,6 +189,8 @@ type EditingAction = EditingTitle | EditingValue | ClearEditing;
 
 type UnlistenAction = Unlisten;
 
+type SubscribeAction = SubscribeNewCollaborator | SubscribeRemoveCollaborator;
+
 export type DraftAction =
   | ListAction
   | DeleteAction
@@ -179,4 +198,5 @@ export type DraftAction =
   | DetailAction
   | BroadcastAction
   | EditingAction
-  | UnlistenAction;
+  | UnlistenAction
+  | SubscribeAction;

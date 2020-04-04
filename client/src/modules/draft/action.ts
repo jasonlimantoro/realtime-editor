@@ -11,6 +11,8 @@ import {
   ClearEditing,
   EditingTitle,
   EditingValue,
+  SubscribeNewCollaborator,
+  SubscribeRemoveCollaborator,
 } from "./types";
 
 const service = serviceRegistry.draft;
@@ -176,15 +178,10 @@ export const listen = ({ field = "value" }) => {
   };
 };
 
-export const unlisten = ({ field = "value" }): Unlisten => {
-  const unlistener: { [key: string]: Function } = {
-    title: service.unlistenTitle,
-    value: service.unlistenTitle,
-  };
-  unlistener[field]();
+export const unlisten = (): Unlisten => {
+  service.requestUtil.unlistenAll();
   return {
     type: DraftActionTypes.UNLISTEN,
-    event: fieldToEventName[field],
   };
 };
 
@@ -201,3 +198,27 @@ export const setEditingValue = (value: any): EditingValue => ({
   type: DraftActionTypes.SET_EDITING_VALUE,
   payload: value,
 });
+
+export const listenCollaboratorChange = () => (dispatch: Dispatch) => {
+  service.listenNewCollaborator((data: any) => {
+    dispatch<SubscribeNewCollaborator>({
+      type: DraftActionTypes.SUBSCRIBE_NEW_COLLABORATOR,
+      payload: data,
+    });
+  });
+  service.listenRemoveCollaborator((data: any) => {
+    dispatch<SubscribeRemoveCollaborator>({
+      type: DraftActionTypes.SUBSCRIBE_REMOVE_COLLABORATOR,
+      payload: data,
+    });
+  });
+};
+
+export const leave = (data: any) => (dispatch: Dispatch) => {
+  service.leaveRoom(data);
+  dispatch<BroadcastSuccess>({
+    type: DraftActionTypes.SET_SUCCESS,
+    scope: Scope.broadcast,
+    event: service.LEAVE_ROOM,
+  });
+};

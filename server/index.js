@@ -6,6 +6,7 @@ const socket = require("socket.io");
 const bodyParser = require("body-parser");
 const morgan = require("morgan");
 const expressJwt = require("express-jwt");
+const jsonwebtoken = require("jsonwebtoken");
 
 const { Draft, User } = require("./database/schema");
 const config = require("./lib/config");
@@ -16,6 +17,13 @@ const port = 4000;
 const app = express();
 const server = http.createServer(app);
 const io = socket(server);
+app.use(morgan("common"));
+app.use(bodyParser.json());
+app.use(
+  cors({
+    origin: "http://localhost:3000"
+  })
+);
 
 function jwt() {
   const secret = config.SECRET;
@@ -34,17 +42,31 @@ async function isRevoked(req, payload, done) {
   }
 }
 
-app.use(morgan("common"));
-app.use(bodyParser.json());
-app.use(
-  cors({
-    origin: "http://localhost:3000"
-  })
-);
-
+io.use((socket, next) => {
+  if (socket.handshake.query && socket.handshake.query.token) {
+    jsonwebtoken.verify(socket.handshake.query.token, config.SECRET, function(
+      err,
+      decoded
+    ) {
+      if (err) return next(new Error("Authentication error"));
+      socket.decoded = decoded;
+      next();
+    });
+  } else {
+    next(new Error("Authentication error"));
+  }
+});
 io.on("connection", function(socket) {
-  socket.on("CREATE_ROOM", (room) => {
+  socket.on("LEAVE_ROOM", async (data) => {
+    const user = await User.findById(socket.decoded.sub);
+    socket.broadcast
+      .to(data.room)
+      .emit("REMOVE_COLLABORATOR", { user: user.username });
+  });
+  socket.on("CREATE_ROOM", async (room) => {
+    const user = await User.findById(socket.decoded.sub);
     socket.join(room);
+    socket.broadcast.to(room).emit("NEW_COLLABORATOR", { user: user.username });
   });
   socket.on("CHANGE_STATE", async (data) => {
     await Draft.findByIdAndUpdate(

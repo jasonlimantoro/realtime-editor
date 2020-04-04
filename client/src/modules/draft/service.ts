@@ -11,6 +11,12 @@ export default class DraftService extends BaseService {
 
   CREATE_ROOM = "CREATE_ROOM";
 
+  LEAVE_ROOM = "LEAVE_ROOM";
+
+  NEW_COLLABORATOR = "NEW_COLLABORATOR";
+
+  REMOVE_COLLABORATOR = "REMOVE_COLLABORATOR";
+
   list = () => this.requestUtil.request({ path: "drafts" });
 
   detail = (id: string) => this.requestUtil.request({ path: `drafts/${id}` });
@@ -38,4 +44,12 @@ export default class DraftService extends BaseService {
   unlistenTitle = () => this.requestUtil.unlisten(this.CHANGE_TITLE_LISTENER);
 
   createRoom = (data: any) => this.requestUtil.emit(this.CREATE_ROOM, data);
+
+  listenNewCollaborator = (cb: any) =>
+    this.requestUtil.listen(this.NEW_COLLABORATOR, cb);
+
+  leaveRoom = (data: any) => this.requestUtil.emit(this.LEAVE_ROOM, data);
+
+  listenRemoveCollaborator = (cb: any) =>
+    this.requestUtil.listen(this.REMOVE_COLLABORATOR, cb);
 }

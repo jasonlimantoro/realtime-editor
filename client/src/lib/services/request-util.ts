@@ -20,7 +20,11 @@ export default class RequestUtilService {
   constructor({ baseUrl = "", namespace = "" } = {}) {
     this.baseUrl = baseUrl;
     this.namespace = namespace;
-    this._io = io(baseUrl);
+    this._io = io.connect(baseUrl, {
+      query: storage.hasCredentials()
+        ? `token=${storage.getCredentials().token}`
+        : "",
+    });
   }
 
   getConfig = (): AxiosRequestConfig => {
@@ -56,11 +60,15 @@ export default class RequestUtilService {
     this._io.emit(event, data);
   };
 
-  listen = async (event: string, cb = () => {}) => {
+  listen = async (event: string, cb: Function) => {
     this._io.on(event, cb);
   };
 
   unlisten = async (event: string) => {
     this._io.off(event);
+  };
+
+  unlistenAll = async () => {
+    this._io.removeAllListeners();
   };
 }
