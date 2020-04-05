@@ -93,26 +93,35 @@ const SyncEditor: React.FC<Props> = ({
     throttledSave(editorState);
   };
 
+  const getEditorState = () => {
+    return EditorState.acceptSelection(
+      editingValue,
+      localEditorState.getSelection()
+    );
+  };
   const handleBold = () => {
-    const state = RichUtils.toggleInlineStyle(editingValue, "BOLD");
+    const state = RichUtils.toggleInlineStyle(getEditorState(), "BOLD");
     handleChange(state);
     saveEditor(state);
   };
   const handleItalic = () => {
-    const state = RichUtils.toggleInlineStyle(editingValue, "ITALIC");
+    const state = RichUtils.toggleInlineStyle(getEditorState(), "ITALIC");
     handleChange(state);
     saveEditor(state);
   };
   const handleBulletPoints = () => {
     const state = RichUtils.toggleBlockType(
-      editingValue,
+      getEditorState(),
       "unordered-list-item"
     );
     handleChange(state);
     saveEditor(state);
   };
   const handleNumberedPoints = () => {
-    const state = RichUtils.toggleBlockType(editingValue, "ordered-list-item");
+    const state = RichUtils.toggleBlockType(
+      getEditorState(),
+      "ordered-list-item"
+    );
     handleChange(state);
     saveEditor(state);
   };
@@ -164,10 +173,7 @@ const SyncEditor: React.FC<Props> = ({
         </div>
         <Editor
           placeholder="Enter something amazing"
-          editorState={EditorState.acceptSelection(
-            editingValue,
-            localEditorState.getSelection()
-          )}
+          editorState={getEditorState()}
           onChange={handleChange}
         />
       </div>
