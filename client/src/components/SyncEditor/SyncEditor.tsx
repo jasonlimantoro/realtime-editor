@@ -1,18 +1,19 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import "draft-js/dist/Draft.css";
-import { Editor, EditorState, convertToRaw, RichUtils } from "draft-js";
+import { convertToRaw, Editor, EditorState, RichUtils } from "draft-js";
 import throttle from "lodash/throttle";
 import {
-  detail,
   broadcast,
-  listen,
-  unlisten,
   clearEditingValue,
+  detail,
+  join,
+  leave,
+  listenCollaboratorChange,
+  listenEditorStateChange,
   setEditingTitle,
   setEditingValue,
-  listenCollaboratorChange,
-  leave,
+  unsubscribe,
 } from "src/modules/draft/action";
 import {
   selectCollaborators,
@@ -44,20 +45,21 @@ const SyncEditor: React.FC<Props> = ({
   broadcast,
   editingTitle,
   editingValue,
-  listen,
-  unlisten,
+  unsubscribe,
   clearEditingValue,
   setEditingTitle,
   setEditingValue,
   listenCollaboratorChange,
+  listenEditorStateChange,
   leave,
   token,
   collaborators,
+  join,
 }) => {
   const saveEditor = (editorState: EditorState) => {
     const raw = convertToRaw(editorState.getCurrentContent());
     broadcast({
-      field: "value",
+      type: "value",
       data: {
         value: raw,
         editorId,
@@ -66,7 +68,7 @@ const SyncEditor: React.FC<Props> = ({
   };
   const saveTitle = (title: string) => {
     broadcast({
-      field: "title",
+      type: "title",
       data: {
         editorId,
         title,
@@ -78,19 +80,40 @@ const SyncEditor: React.FC<Props> = ({
   const throttledSaveTitle = useCallback(throttle(saveTitle, 500), [editorId]);
 
   useEffect(() => {
-    listenCollaboratorChange();
-  }, [listenCollaboratorChange]);
-  useEffect(() => {
     detail(editorId);
   }, [detail, editorId]);
+
   useEffect(() => {
-    broadcast({ field: "room", data: { room: editorId }, meta: { token } });
-  }, [editorId, broadcast, token]);
+    const payload = { room: editorId, meta: { token } };
+    join(payload);
+    return () => {
+      leave(payload);
+    };
+  }, [editorId, join, token, leave]);
+
+  useEffect(() => {
+    listenEditorStateChange();
+    listenCollaboratorChange();
+    return () => {
+      clearEditingValue();
+      unsubscribe();
+    };
+  }, [
+    listenEditorStateChange,
+    unsubscribe,
+    clearEditingValue,
+    listenCollaboratorChange,
+  ]);
 
   const handleChange = (editorState: EditorState) => {
     localEditorState = editorState;
     setEditingValue(convertToRaw(editorState.getCurrentContent()));
     throttledSave(editorState);
+  };
+
+  const handleChangeTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEditingTitle(e.target.value);
+    throttledSaveTitle(e.target.value);
   };
 
   const getEditorState = () => {
@@ -102,12 +125,26 @@ const SyncEditor: React.FC<Props> = ({
   const handleBold = () => {
     const state = RichUtils.toggleInlineStyle(getEditorState(), "BOLD");
     handleChange(state);
-    saveEditor(state);
+    const raw = convertToRaw(state.getCurrentContent());
+    broadcast({
+      type: "value",
+      data: {
+        value: raw,
+        editorId,
+      },
+    });
   };
   const handleItalic = () => {
     const state = RichUtils.toggleInlineStyle(getEditorState(), "ITALIC");
     handleChange(state);
-    saveEditor(state);
+    const raw = convertToRaw(state.getCurrentContent());
+    broadcast({
+      type: "value",
+      data: {
+        value: raw,
+        editorId,
+      },
+    });
   };
   const handleBulletPoints = () => {
     const state = RichUtils.toggleBlockType(
@@ -115,7 +152,14 @@ const SyncEditor: React.FC<Props> = ({
       "unordered-list-item"
     );
     handleChange(state);
-    saveEditor(state);
+    const raw = convertToRaw(state.getCurrentContent());
+    broadcast({
+      type: "value",
+      data: {
+        value: raw,
+        editorId,
+      },
+    });
   };
   const handleNumberedPoints = () => {
     const state = RichUtils.toggleBlockType(
@@ -123,26 +167,14 @@ const SyncEditor: React.FC<Props> = ({
       "ordered-list-item"
     );
     handleChange(state);
-    saveEditor(state);
-  };
-
-  useEffect(() => {
-    listen({ field: "title" });
-    listen({ field: "value" });
-    return () => {
-      unlisten();
-    };
-  }, [listen, unlisten]);
-
-  useEffect(() => {
-    return () => {
-      leave({ room: editorId, meta: { token } });
-      clearEditingValue();
-    };
-  }, [clearEditingValue, leave, editorId, token]);
-  const handleChangeTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEditingTitle(e.target.value);
-    throttledSaveTitle(e.target.value);
+    const raw = convertToRaw(state.getCurrentContent());
+    broadcast({
+      type: "value",
+      data: {
+        value: raw,
+        editorId,
+      },
+    });
   };
 
   return (
@@ -212,12 +244,13 @@ const mapStateToProps = (
 const mapDispatchToProps = {
   detail,
   broadcast,
-  listen,
-  unlisten,
+  unsubscribe,
   clearEditingValue,
   setEditingTitle,
   setEditingValue,
   listenCollaboratorChange,
+  listenEditorStateChange,
+  join,
   leave,
 };
 

@@ -87,10 +87,12 @@ const reducer = (state = initialState, action: DraftAction) =>
         break;
 
       case DraftActionTypes.SET_EDITING_TITLE:
+      case DraftActionTypes.SUBSCRIBE_EDITING_TITLE:
         draft.editing.title = action.payload;
         break;
 
       case DraftActionTypes.SET_EDITING_VALUE:
+      case DraftActionTypes.SUBSCRIBE_EDITING_VALUE:
         draft.editing.value = action.payload;
         break;
       case DraftActionTypes.CLEAR_EDITING_STATE:

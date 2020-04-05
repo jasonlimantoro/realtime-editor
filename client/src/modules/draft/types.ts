@@ -1,4 +1,5 @@
 import { DraftSchema } from "src/lib/entities/draft";
+import { RawDraftContentState } from "draft-js";
 
 export interface State {
   drafts: DraftSchema[];
@@ -27,21 +28,27 @@ export enum Scope {
   create = "create",
   detail = "detail",
   delete = "delete",
-  broadcast = "broadcast",
 }
 
 export enum DraftActionTypes {
   SET_BEGIN = "DRAFT/SET_BEGIN",
   SET_SUCCESS = "DRAFT/SET_SUCCESS",
   SET_FAILURE = "DRAFT/SET_FAILURE",
+  CLEAR_EDITING_STATE = "DRAFT/CLEAR_EDITING_STATE",
+
+  BROADCAST_TITLE = "DRAFT/BROADCAST_TITLE",
+  BROADCAST_VALUE = "DRAFT/BROADCAST_VALUE",
+  BROADCAST_JOIN = "DRAFT/BROADCAST_JOIN",
+  BROADCAST_LEAVE = "DRAFT/BROADCAST_LEAVE",
 
   SET_EDITING_TITLE = "DRAFT/SET_EDITING_TITLE",
   SET_EDITING_VALUE = "DRAFT/SET_EDITING_VALUE",
-  CLEAR_EDITING_STATE = "DRAFT/CLEAR_EDITING_STATE",
 
+  SUBSCRIBE_EDITING_TITLE = "DRAFT/SUBSCRIBE_EDITING_TITLE",
+  SUBSCRIBE_EDITING_VALUE = "DRAFT/SUBSCRIBE_EDITING_VALUE",
   SUBSCRIBE_NEW_COLLABORATOR = "DRAFT/SUBSCRIBE_NEW_COLLABORATOR",
   SUBSCRIBE_REMOVE_COLLABORATOR = "DRAFT/SUBSCRIBE_REMOVE_COLLABORATOR",
-  UNLISTEN = "DRAFT/UNLISTEN",
+  UNSUBSCRIBE = "DRAFT/UNSUBSCRIBE",
 }
 
 export interface ListBeginAction {
@@ -116,38 +123,46 @@ export interface CreateFailureAction {
   payload: any;
 }
 
-export interface BroadcastBegin {
-  type: DraftActionTypes.SET_BEGIN;
-  scope: Scope.broadcast;
-  event: string;
+export interface BroadcastTitle {
+  type: DraftActionTypes.BROADCAST_TITLE;
   payload: any;
 }
 
-export interface BroadcastSuccess {
-  type: DraftActionTypes.SET_SUCCESS;
-  scope: Scope.broadcast;
-  event: string;
-}
-
-export interface BroadcastError {
-  type: DraftActionTypes.SET_FAILURE;
-  scope: Scope.broadcast;
-  event: string;
+export interface BroadcastValue {
+  type: DraftActionTypes.BROADCAST_VALUE;
   payload: any;
 }
 
-export interface EditingTitle {
+export interface BroadcastJoin {
+  type: DraftActionTypes.BROADCAST_JOIN;
+  payload: any;
+}
+
+export interface BroadcastLeave {
+  type: DraftActionTypes.BROADCAST_LEAVE;
+  payload: any;
+}
+
+export interface SetEditingTitle {
   type: DraftActionTypes.SET_EDITING_TITLE;
   payload: string;
 }
-
-export interface EditingValue {
+export interface SetEditingValue {
   type: DraftActionTypes.SET_EDITING_VALUE;
-  payload: any;
+  payload: RawDraftContentState;
+}
+export interface SubscribeEditingTitle {
+  type: DraftActionTypes.SUBSCRIBE_EDITING_TITLE;
+  payload: string;
 }
 
-export interface Unlisten {
-  type: DraftActionTypes.UNLISTEN;
+export interface SubscribeEditingValue {
+  type: DraftActionTypes.SUBSCRIBE_EDITING_VALUE;
+  payload: RawDraftContentState;
+}
+
+export interface Unsubscribe {
+  type: DraftActionTypes.UNSUBSCRIBE;
   event?: string;
 }
 
@@ -188,13 +203,26 @@ type DetailAction =
   | DetailSuccessAction
   | DetailFailureAction;
 
-type BroadcastAction = BroadcastBegin | BroadcastSuccess | BroadcastError;
+type BroadcastAction =
+  | BroadcastTitle
+  | BroadcastValue
+  | BroadcastJoin
+  | BroadcastLeave;
 
-type EditingAction = EditingTitle | EditingValue | ClearEditing;
+type EditingAction =
+  | SubscribeEditingTitle
+  | SubscribeEditingValue
+  | SetEditingValue
+  | SetEditingTitle
+  | ClearEditing;
 
-type UnlistenAction = Unlisten;
+type UnsubscribeAction = Unsubscribe;
 
-type SubscribeAction = SubscribeNewCollaborator | SubscribeRemoveCollaborator;
+type SubscribeAction =
+  | SubscribeNewCollaborator
+  | SubscribeRemoveCollaborator
+  | SubscribeEditingTitle
+  | SubscribeEditingValue;
 
 export type DraftAction =
   | ListAction
@@ -203,5 +231,5 @@ export type DraftAction =
   | DetailAction
   | BroadcastAction
   | EditingAction
-  | UnlistenAction
+  | UnsubscribeAction
   | SubscribeAction;

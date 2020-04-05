@@ -1,18 +1,17 @@
 import { serviceRegistry } from "src/lib/services/registry";
 import { Dispatch } from "redux";
+import { RawDraftContentState } from "draft-js";
 import { tryCatch } from "src/lib/utils";
 import {
+  ClearEditing,
+  DraftAction,
   DraftActionTypes,
   Scope,
-  Unlisten,
-  BroadcastBegin,
-  BroadcastSuccess,
-  BroadcastError,
-  ClearEditing,
-  EditingTitle,
-  EditingValue,
-  SubscribeNewCollaborator,
-  SubscribeRemoveCollaborator,
+  SetEditingTitle,
+  SetEditingValue,
+  SubscribeEditingTitle,
+  SubscribeEditingValue,
+  Unsubscribe,
 } from "./types";
 
 const service = serviceRegistry.draft;
@@ -114,77 +113,37 @@ export const detail = (id: string) => async (dispatch: Dispatch) => {
   });
 };
 
-const fieldToEventName: { [key: string]: string } = {
-  value: service.CHANGE_STATE,
-  title: service.CHANGE_TITLE,
-  room: service.CREATE_ROOM,
-};
-
 export const broadcast = ({
-  field = "value",
+  type = "value",
   data,
-  meta,
 }: {
-  field: string;
+  type: "value" | "title";
   data: any;
-  meta?: any;
 }) => {
-  const broadcaster: { [key: string]: Function } = {
-    value: service.broadcastState,
-    title: service.broadcastTitle,
-    room: service.createRoom,
-  };
-
   return async (dispatch: Dispatch) => {
-    dispatch<BroadcastBegin>({
-      type: DraftActionTypes.SET_BEGIN,
-      scope: Scope.broadcast,
-      event: fieldToEventName[field],
-      payload: data,
-    });
-    await tryCatch(() => broadcaster[field]({ ...data, meta }))({
-      successFn() {
-        dispatch<BroadcastSuccess>({
-          type: DraftActionTypes.SET_SUCCESS,
-          scope: Scope.broadcast,
-          event: fieldToEventName[field],
+    switch (type) {
+      case "value":
+        dispatch<DraftAction>({
+          type: DraftActionTypes.BROADCAST_VALUE,
+          payload: data,
         });
-      },
-      errorFn(err) {
-        dispatch<BroadcastError>({
-          type: DraftActionTypes.SET_FAILURE,
-          scope: Scope.broadcast,
-          event: fieldToEventName[field],
-          payload: err,
+        service.broadcastState(data);
+        break;
+      case "title":
+        dispatch<DraftAction>({
+          type: DraftActionTypes.BROADCAST_TITLE,
+          payload: data,
         });
-      },
-    });
+        service.broadcastTitle(data);
+        break;
+    }
   };
 };
 
-export const listen = ({ field = "value" }) => {
-  const listener: { [key: string]: Function } = {
-    title: service.listenTitle,
-    value: service.listenState,
-  };
-  const fieldToActionType: { [key: string]: string } = {
-    title: DraftActionTypes.SET_EDITING_TITLE,
-    value: DraftActionTypes.SET_EDITING_VALUE,
-  };
-  return async (dispatch: Dispatch) => {
-    listener[field]((data: any) => {
-      dispatch({
-        type: fieldToActionType[field],
-        payload: data[field],
-      });
-    });
-  };
-};
-
-export const unlisten = (): Unlisten => {
+export const unsubscribe = (): Unsubscribe => {
   service.requestUtil.unlistenAll();
   return {
-    type: DraftActionTypes.UNLISTEN,
+    type: DraftActionTypes.UNSUBSCRIBE,
   };
 };
 
@@ -192,36 +151,62 @@ export const clearEditingValue = (): ClearEditing => ({
   type: DraftActionTypes.CLEAR_EDITING_STATE,
 });
 
-export const setEditingTitle = (title: string): EditingTitle => ({
+export const setEditingTitle = (title: string): SetEditingTitle => ({
   type: DraftActionTypes.SET_EDITING_TITLE,
   payload: title,
 });
 
-export const setEditingValue = (value: any): EditingValue => ({
+export const setEditingValue = (
+  value: RawDraftContentState
+): SetEditingValue => ({
   type: DraftActionTypes.SET_EDITING_VALUE,
   payload: value,
 });
 
+const subscribeEditingTitle = (title: string): SubscribeEditingTitle => ({
+  type: DraftActionTypes.SUBSCRIBE_EDITING_TITLE,
+  payload: title,
+});
+
+const subscribeEditingValue = (value: any): SubscribeEditingValue => ({
+  type: DraftActionTypes.SUBSCRIBE_EDITING_VALUE,
+  payload: value,
+});
+
+export const listenEditorStateChange = () => (dispatch: Dispatch) => {
+  service.listenState((data: any) => {
+    dispatch(subscribeEditingValue(data.value));
+  });
+  service.listenTitle((data: any) => {
+    dispatch(subscribeEditingTitle(data.title));
+  });
+};
 export const listenCollaboratorChange = () => (dispatch: Dispatch) => {
   service.listenNewCollaborator((data: any) => {
-    dispatch<SubscribeNewCollaborator>({
+    dispatch<DraftAction>({
       type: DraftActionTypes.SUBSCRIBE_NEW_COLLABORATOR,
       payload: data,
     });
   });
   service.listenRemoveCollaborator((data: any) => {
-    dispatch<SubscribeRemoveCollaborator>({
+    dispatch<DraftAction>({
       type: DraftActionTypes.SUBSCRIBE_REMOVE_COLLABORATOR,
       payload: data,
     });
   });
 };
 
+export const join = (data: any) => (dispatch: Dispatch) => {
+  service.createRoom(data);
+  dispatch<DraftAction>({
+    type: DraftActionTypes.BROADCAST_JOIN,
+    payload: data,
+  });
+};
 export const leave = (data: any) => (dispatch: Dispatch) => {
   service.leaveRoom(data);
-  dispatch<BroadcastSuccess>({
-    type: DraftActionTypes.SET_SUCCESS,
-    scope: Scope.broadcast,
-    event: service.LEAVE_ROOM,
+  dispatch<DraftAction>({
+    type: DraftActionTypes.BROADCAST_LEAVE,
+    payload: data,
   });
 };

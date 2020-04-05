@@ -11,7 +11,7 @@ const userSchema = new Schema(
   { versionKey: false, id: false }
 );
 
-userSchema.pre("save", async function(next) {
+userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
     return next();
   }
@@ -19,11 +19,11 @@ userSchema.pre("save", async function(next) {
   next();
 });
 
-userSchema.methods.comparePassword = function(plaintext) {
+userSchema.methods.comparePassword = function (plaintext) {
   return bcrypt.compare(plaintext, this.password);
 };
-userSchema.virtual("token").get(function() {
-  return jwt.sign({ sub: this._id }, config.SECRET, { expiresIn: "15m" });
+userSchema.virtual("token").get(function () {
+  return jwt.sign({ sub: this._id }, config.SECRET, { expiresIn: "2h" });
 });
 
 const User = model("users", userSchema);
