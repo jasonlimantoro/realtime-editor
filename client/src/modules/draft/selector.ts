@@ -2,6 +2,7 @@ import { createSelector } from "reselect";
 import moment from "moment";
 import { AppState } from "src/modules/types";
 import { EditorState, convertFromRaw } from "draft-js";
+import { selectLoggedInUser } from "src/modules/auth/selector";
 
 const selectDrafts = (state: AppState) => state.draft.drafts;
 const selectEditing = (state: AppState) => state.draft.editing;
@@ -46,3 +47,19 @@ export const selectEditingValue = createSelector(selectEditing, (state) => {
   }
   return EditorState.createWithContent(convertFromRaw(state.value));
 });
+
+export const selectCollaborators = createSelector(
+  selectEditing,
+  selectLoggedInUser,
+  (editing, username) => {
+    return Object.keys(editing.collaborators).reduce<string[]>(
+      (accum, current) => {
+        if (current === username) {
+          return accum;
+        }
+        return [...accum, current];
+      },
+      []
+    );
+  }
+);

@@ -11,6 +11,7 @@
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
     "axios": "^0.19.2",
+    "classnames": "^2.2.6",
     "draft-js": "^0.11.5",
     "formik": "^2.1.4",
     "immer": "^6.0.2",
@@ -71,6 +72,7 @@
   "devDependencies": {
     "@fullhuman/postcss-purgecss": "^2.1.0",
     "@types/axios": "^0.14.0",
+    "@types/classnames": "^2.2.10",
     "@types/draft-js": "^0.10.38",
     "@types/lodash": "^4.14.149",
     "@types/moment": "^2.13.0",

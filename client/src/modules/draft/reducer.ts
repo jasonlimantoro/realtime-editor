@@ -98,12 +98,11 @@ const reducer = (state = initialState, action: DraftAction) =>
         break;
 
       case DraftActionTypes.SUBSCRIBE_NEW_COLLABORATOR:
-        draft.editing.collaborators[action.payload.clientId] =
-          action.payload.user;
+        draft.editing.collaborators = action.payload.collaborators;
         break;
 
       case DraftActionTypes.SUBSCRIBE_REMOVE_COLLABORATOR:
-        delete draft.editing.collaborators[action.payload.clientId];
+        delete draft.editing.collaborators[action.payload.user];
         break;
     }
   });

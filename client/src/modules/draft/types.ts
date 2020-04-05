@@ -160,6 +160,7 @@ export interface SubscribeNewCollaborator {
   payload: {
     user: string;
     clientId: string;
+    collaborators: any;
   };
 }
 

@@ -17,7 +17,7 @@ const Editor: React.FC<Props> = ({ create }) => {
   return (
     <div className="p-8">
       <Link className="underline" to="/editors">
-        List of Editors
+        Leave Editor
       </Link>
       <SyncEditor className="p-8 bg-gray-200" editorId={editorId} />
     </div>

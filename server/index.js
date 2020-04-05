@@ -42,42 +42,33 @@ async function isRevoked(req, payload, done) {
   }
 }
 
-// io.use((socket, next) => {
-//   if (socket.handshake.query && socket.handshake.query.token) {
-//     jsonwebtoken.verify(socket.handshake.query.token, config.SECRET, function (
-//       err,
-//       decoded
-//     ) {
-//       if (err) {
-//         return next(new Error("Authentication error"));
-//       }
-//       socket.decoded = decoded;
-//       next();
-//     });
-//   } else {
-//     next(new Error("Authentication error"));
-//   }
-// });
+const rooms = {};
 io.on("connection", function (socket) {
   socket.on("LEAVE_ROOM", async (data) => {
     const decoded = jsonwebtoken.decode(data.meta.token);
     const user = await User.findById(decoded.sub);
+    delete rooms[data.room][user.username];
+    socket.leave(data.room);
     socket.broadcast.to(data.room).emit("REMOVE_COLLABORATOR", {
       user: user.username,
       clientId: socket.id,
     });
   });
   socket.on("CREATE_ROOM", async (data) => {
-    // const user = await User.findById(socket.decoded.sub);
     const decoded = jsonwebtoken.decode(data.meta.token);
     const user = await User.findById(decoded.sub);
     socket.join(data.room);
-    socket.broadcast
-      .to(data.room)
-      .emit("NEW_COLLABORATOR", { user: user.username, clientId: socket.id });
-    // io.in(room).clients((err, clients) => {
-    //   console.log(clients);
-    // });
+    rooms[data.room] = rooms[data.room]
+      ? {
+          ...rooms[data.room],
+          [user.username]: socket.id,
+        }
+      : { [user.username]: socket.id };
+    io.to(data.room).emit("NEW_COLLABORATOR", {
+      user: user.username,
+      clientId: socket.id,
+      collaborators: rooms[data.room],
+    });
   });
   socket.on("CHANGE_STATE", async (data) => {
     await Draft.findByIdAndUpdate(

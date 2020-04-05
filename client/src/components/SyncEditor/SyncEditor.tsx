@@ -15,6 +15,7 @@ import {
   leave,
 } from "src/modules/draft/action";
 import {
+  selectCollaborators,
   selectDraftById,
   selectEditingTitle,
   selectEditingValue,
@@ -51,6 +52,7 @@ const SyncEditor: React.FC<Props> = ({
   listenCollaboratorChange,
   leave,
   token,
+  collaborators,
 }) => {
   const saveEditor = (editorState: EditorState) => {
     const raw = convertToRaw(editorState.getCurrentContent());
@@ -169,6 +171,23 @@ const SyncEditor: React.FC<Props> = ({
           onChange={handleChange}
         />
       </div>
+      <div>
+        <p className="text-xl">
+          Collaborators: You{" "}
+          {collaborators.length ? (
+            <span>and {collaborators.length} others</span>
+          ) : (
+            <span>only</span>
+          )}
+        </p>
+        <ul>
+          {collaborators.map((c, idx) => (
+            <li key={idx}>
+              {c} <span className="italic text-gray-700">is collaborating</span>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };
@@ -181,6 +200,7 @@ const mapStateToProps = (
   editingTitle: selectEditingTitle(state),
   editingValue: selectEditingValue(state),
   token: selectToken(state),
+  collaborators: selectCollaborators(state),
 });
 
 const mapDispatchToProps = {
