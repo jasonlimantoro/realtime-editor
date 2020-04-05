@@ -1,6 +1,5 @@
 import axios, { AxiosRequestConfig } from "axios";
-import io from "socket.io-client";
-import CustomStorage from "../storage";
+import { defaultStorage } from "src/lib/storage";
 
 interface RequestParams {
   method?: "get" | "post" | "patch" | "put" | "delete";
@@ -8,23 +7,16 @@ interface RequestParams {
   data?: any;
 }
 
-const storage = new CustomStorage();
+const storage = defaultStorage;
 
 export default class RequestUtilService {
   public baseUrl: String;
 
   public namespace: String;
 
-  public _io: SocketIOClient.Socket;
-
   constructor({ baseUrl = "", namespace = "" } = {}) {
     this.baseUrl = baseUrl;
     this.namespace = namespace;
-    this._io = io.connect(baseUrl, {
-      query: storage.hasCredentials()
-        ? `token=${storage.getCredentials().token}`
-        : "",
-    });
   }
 
   getConfig = (): AxiosRequestConfig => {
@@ -54,21 +46,5 @@ export default class RequestUtilService {
       case "delete":
         return axios.delete(finalPath, this.getConfig());
     }
-  };
-
-  emit = async (event: string, data: any) => {
-    this._io.emit(event, data);
-  };
-
-  listen = async (event: string, cb: Function) => {
-    this._io.on(event, cb);
-  };
-
-  unlisten = async (event: string) => {
-    this._io.off(event);
-  };
-
-  unlistenAll = async () => {
-    this._io.removeAllListeners();
   };
 }

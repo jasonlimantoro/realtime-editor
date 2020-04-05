@@ -20,6 +20,7 @@ import {
   selectEditingValue,
 } from "src/modules/draft/selector";
 import { AppState } from "src/modules/types";
+import { selectToken } from "src/modules/auth/selector";
 
 interface Props extends PropsFromRedux {
   className: string;
@@ -49,6 +50,7 @@ const SyncEditor: React.FC<Props> = ({
   setEditingValue,
   listenCollaboratorChange,
   leave,
+  token,
 }) => {
   const saveEditor = (editorState: EditorState) => {
     const raw = convertToRaw(editorState.getCurrentContent());
@@ -80,8 +82,8 @@ const SyncEditor: React.FC<Props> = ({
     detail(editorId);
   }, [detail, editorId]);
   useEffect(() => {
-    broadcast({ field: "room", data: editorId });
-  }, [editorId, broadcast]);
+    broadcast({ field: "room", data: { room: editorId }, meta: { token } });
+  }, [editorId, broadcast, token]);
 
   const handleChange = (editorState: EditorState) => {
     localEditorState = editorState;
@@ -123,10 +125,10 @@ const SyncEditor: React.FC<Props> = ({
 
   useEffect(() => {
     return () => {
-      leave({ room: editorId });
+      leave({ room: editorId, meta: { token } });
       clearEditingValue();
     };
-  }, [clearEditingValue, leave, editorId]);
+  }, [clearEditingValue, leave, editorId, token]);
   const handleChangeTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEditingTitle(e.target.value);
     throttledSaveTitle(e.target.value);
@@ -178,6 +180,7 @@ const mapStateToProps = (
   draft: selectDraftById(state, { id: editorId }),
   editingTitle: selectEditingTitle(state),
   editingValue: selectEditingValue(state),
+  token: selectToken(state),
 });
 
 const mapDispatchToProps = {

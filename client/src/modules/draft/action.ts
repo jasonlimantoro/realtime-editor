@@ -31,9 +31,10 @@ export const list = () => async (dispatch: Dispatch) => {
       });
     },
     errorFn(err) {
+      console.error(err);
       dispatch({
         type: DraftActionTypes.SET_FAILURE,
-        payload: err.response,
+        payload: err.response || err,
         scope: Scope.list,
       });
     },
@@ -122,9 +123,11 @@ const fieldToEventName: { [key: string]: string } = {
 export const broadcast = ({
   field = "value",
   data,
+  meta,
 }: {
   field: string;
   data: any;
+  meta?: any;
 }) => {
   const broadcaster: { [key: string]: Function } = {
     value: service.broadcastState,
@@ -139,7 +142,7 @@ export const broadcast = ({
       event: fieldToEventName[field],
       payload: data,
     });
-    await tryCatch(() => broadcaster[field](data))({
+    await tryCatch(() => broadcaster[field]({ ...data, meta }))({
       successFn() {
         dispatch<BroadcastSuccess>({
           type: DraftActionTypes.SET_SUCCESS,

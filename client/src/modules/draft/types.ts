@@ -15,7 +15,9 @@ export interface State {
   editing: {
     title: string;
     value: any;
-    collaborators: any[];
+    collaborators: {
+      [key: string]: string;
+    };
   };
   [key: string]: any;
 }
@@ -156,14 +158,16 @@ export interface ClearEditing {
 export interface SubscribeNewCollaborator {
   type: DraftActionTypes.SUBSCRIBE_NEW_COLLABORATOR;
   payload: {
-    username: string;
+    user: string;
+    clientId: string;
   };
 }
 
 export interface SubscribeRemoveCollaborator {
   type: DraftActionTypes.SUBSCRIBE_REMOVE_COLLABORATOR;
   payload: {
-    username: string;
+    user: string;
+    clientId: string;
   };
 }
 

@@ -26,7 +26,7 @@ const initialState: State = {
   editing: {
     title: "",
     value: null,
-    collaborators: [],
+    collaborators: {},
   },
 };
 
@@ -94,24 +94,16 @@ const reducer = (state = initialState, action: DraftAction) =>
         draft.editing.value = action.payload;
         break;
       case DraftActionTypes.CLEAR_EDITING_STATE:
-        draft.editing = {
-          value: null,
-          title: "",
-          collaborators: [],
-        };
+        draft.editing = initialState.editing;
         break;
 
       case DraftActionTypes.SUBSCRIBE_NEW_COLLABORATOR:
-        draft.editing.collaborators.push(action.payload);
+        draft.editing.collaborators[action.payload.clientId] =
+          action.payload.user;
         break;
 
       case DraftActionTypes.SUBSCRIBE_REMOVE_COLLABORATOR:
-        draft.editing.collaborators.splice(
-          draft.editing.collaborators.findIndex(
-            ({ username }) => username === action.payload.username
-          ),
-          1
-        );
+        delete draft.editing.collaborators[action.payload.clientId];
         break;
     }
   });

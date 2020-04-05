@@ -38,3 +38,7 @@ export default class CustomStorage {
     return this.getCredentials() !== null;
   }
 }
+
+const defaultStorage = new CustomStorage();
+
+export { defaultStorage };

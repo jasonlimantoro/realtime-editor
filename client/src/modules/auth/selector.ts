@@ -15,3 +15,8 @@ export const selectLogoutReason = createSelector(
   (state: AppState) => state.auth.logoutReason,
   (state) => state
 );
+
+export const selectToken = createSelector(
+  (state: AppState) => state.auth.credentials.token,
+  (state) => state
+);

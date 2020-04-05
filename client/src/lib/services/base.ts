@@ -1,11 +1,11 @@
 import RequestUtilService from "./request-util";
 
 export default class BaseService {
-  public baseUrl: String;
+  public baseUrl: string;
 
-  public namespace: String;
+  public namespace: string;
 
-  public requestUtil: RequestUtilService;
+  public requestUtil: any;
 
   constructor({
     baseUrl = "",

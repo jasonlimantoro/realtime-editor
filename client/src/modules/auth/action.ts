@@ -1,11 +1,11 @@
 import { tryCatch } from "src/lib/utils";
 import { Dispatch } from "redux";
 import { serviceRegistry } from "src/lib/services/registry";
-import CustomStorage from "src/lib/storage";
+import { defaultStorage } from "src/lib/storage";
 import { AuthActionType, HydrateAction, LogoutAction } from "./types";
 
 const service = serviceRegistry.auth;
-const storage = new CustomStorage();
+const storage = defaultStorage;
 
 export const login = (username: string, password: string) => async (
   dispatch: Dispatch
