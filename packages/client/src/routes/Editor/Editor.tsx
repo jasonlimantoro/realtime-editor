@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import { useParams, Link } from "react-router-dom";
 import { AppState } from "src/modules/types";
-import { create } from "src/modules/draft/action";
+import { crud } from "src/modules/draft/action";
 import SyncEditorContainer from "src/components/SyncEditor/SyncEditorContainer";
 
 interface EditorProps {}
@@ -33,6 +33,6 @@ interface LinkMapDispatchProps {
 const mapStateToProps = (_state: AppState): LinkMapStateProps => ({});
 
 const mapDispatchToProps: LinkMapDispatchProps = {
-  create,
+  create: crud.create,
 };
 export default connect(mapStateToProps, mapDispatchToProps)(Editor);

@@ -132,7 +132,7 @@ const mapStateToProps = (state: AppState) => ({
 });
 
 const mapDispatchToProps = {
-  detail: actions.detail,
+  detail: actions.crud.detail,
   broadcast: actions.broadcast,
   unsubscribe: actions.unsubscribe,
   clearEditingValue: actions.clearEditingValue,

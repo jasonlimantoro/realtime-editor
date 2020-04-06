@@ -17,6 +17,8 @@ export default class DraftService extends BaseService {
 
   REMOVE_COLLABORATOR = "REMOVE_COLLABORATOR";
 
+  update: any;
+
   list = () => this.requestUtil.request({ path: "drafts" });
 
   detail = (id: string) => this.requestUtil.request({ path: `drafts/${id}` });

@@ -1,7 +1,7 @@
 import { serviceRegistry } from "src/lib/services/registry";
 import { Dispatch } from "redux";
 import { RawDraftContentState } from "draft-js";
-import { tryCatch } from "src/lib/utils";
+import { crudActions } from "src/lib/redux-utils";
 import {
   ClearEditing,
   DraftAction,
@@ -16,102 +16,51 @@ import {
 
 const service = serviceRegistry.draft;
 
-export const list = () => async (dispatch: Dispatch) => {
-  dispatch({
-    type: DraftActionTypes.SET_BEGIN,
-    scope: Scope.list,
-  });
-  await tryCatch(() => service.list())({
-    successFn(resp) {
-      dispatch({
-        type: DraftActionTypes.SET_SUCCESS,
-        payload: resp.data,
-        scope: Scope.list,
-      });
-    },
-    errorFn(err) {
-      console.error(err);
-      dispatch({
-        type: DraftActionTypes.SET_FAILURE,
-        payload: err.response || err,
-        scope: Scope.list,
-      });
-    },
-  });
-};
+const onStart = (scope: Scope) => ({
+  type: DraftActionTypes.SET_BEGIN,
+  scope,
+});
 
-export const remove = (id: string) => async (dispatch: Dispatch) => {
-  dispatch({
-    type: DraftActionTypes.SET_BEGIN,
-    scope: Scope.delete,
-  });
-  await tryCatch(() => service.destroy(id))({
-    successFn() {
-      dispatch({
-        type: DraftActionTypes.SET_SUCCESS,
-        payload: {
-          id,
-        },
-        scope: Scope.delete,
-      });
-    },
-    errorFn(err) {
-      dispatch({
-        type: DraftActionTypes.SET_FAILURE,
-        payload: err.response,
-        scope: Scope.delete,
-      });
-    },
-  });
-};
+const onSuccess = (scope: Scope, payload: any) => ({
+  type: DraftActionTypes.SET_SUCCESS,
+  scope,
+  payload,
+});
 
-export const create = (body: any) => async (dispatch: Dispatch) => {
-  dispatch({
-    type: DraftActionTypes.SET_BEGIN,
-    scope: Scope.create,
-    payload: body,
-  });
-  await tryCatch(() => service.create(body))({
-    successFn(resp) {
-      dispatch({
-        type: DraftActionTypes.SET_SUCCESS,
-        payload: resp.data,
-        scope: Scope.create,
-      });
-    },
-    errorFn(err) {
-      dispatch({
-        type: DraftActionTypes.SET_FAILURE,
-        payload: err.response,
-        scope: Scope.create,
-      });
-    },
-  });
-};
+const onFailure = (scope: Scope, payload: any) => ({
+  type: DraftActionTypes.SET_FAILURE,
+  scope,
+  payload,
+});
 
-export const detail = (id: string) => async (dispatch: Dispatch) => {
-  dispatch({
-    type: DraftActionTypes.SET_BEGIN,
-    scope: Scope.detail,
-    payload: id,
-  });
-  await tryCatch(() => service.detail(id))({
-    successFn(resp) {
-      dispatch({
-        type: DraftActionTypes.SET_SUCCESS,
-        payload: resp.data,
-        scope: Scope.detail,
-      });
+export const crud = crudActions({
+  service,
+  handler: {
+    list: {
+      onStart: () => onStart(Scope.list),
+      onSuccess: (data: any) => onSuccess(Scope.list, data),
+      onFailure: (error: any) => onFailure(Scope.list, error.response || error),
     },
-    errorFn(err) {
-      dispatch({
-        type: DraftActionTypes.SET_FAILURE,
-        payload: err.response,
-        scope: Scope.detail,
-      });
+    remove: {
+      onStart: () => onStart(Scope.delete),
+      onSuccess: (data: any) => onSuccess(Scope.delete, data),
+      onFailure: (error: any) =>
+        onFailure(Scope.delete, error.response || error),
     },
-  });
-};
+    create: {
+      onStart: () => onStart(Scope.create),
+      onSuccess: (data: any) => onSuccess(Scope.create, data),
+      onFailure: (error: any) =>
+        onFailure(Scope.create, error.response || error),
+    },
+    detail: {
+      onStart: () => onStart(Scope.detail),
+      onSuccess: (data: any) => onSuccess(Scope.detail, data),
+      onFailure: (error: any) =>
+        onFailure(Scope.detail, error.response || error),
+    },
+  },
+});
 
 export const broadcast = ({
   type = "value",

@@ -6,7 +6,7 @@ import { DraftSchema } from "src/lib/entities/draft";
 import { ellipsis } from "src/lib/utils";
 import { AppState } from "src/modules/types";
 import { logout } from "src/modules/auth/action";
-import { list, remove } from "src/modules/draft/action";
+import { crud } from "src/modules/draft/action";
 import { selectLoggedInUser } from "src/modules/auth/selector";
 import {
   selectDraftByDate,
@@ -88,7 +88,7 @@ const mapStateToProps = (state: AppState): LinkMapStateProps => ({
 
 const mapDispatchToProps: LinkMapDispatchProps = {
   logout,
-  list,
-  remove,
+  list: crud.list,
+  remove: crud.remove,
 };
 export default connect(mapStateToProps, mapDispatchToProps)(ListEditor);
