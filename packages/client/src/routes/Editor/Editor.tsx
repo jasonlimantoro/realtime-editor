@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
 import { connect } from "react-redux";
-import SyncEditor from "src/components/SyncEditor";
 import { useParams, Link } from "react-router-dom";
 import { AppState } from "src/modules/types";
 import { create } from "src/modules/draft/action";
+import SyncEditorContainer from "src/components/SyncEditor/SyncEditorContainer";
 
 interface EditorProps {}
 
@@ -19,7 +19,7 @@ const Editor: React.FC<Props> = ({ create }) => {
       <Link className="underline" to="/editors">
         Leave Editor
       </Link>
-      <SyncEditor className="p-8 bg-gray-200" editorId={editorId} />
+      <SyncEditorContainer className="p-8 bg-gray-200" editorId={editorId} />
     </div>
   );
 };
