@@ -1,16 +1,16 @@
-const express = require("express");
-const { Draft } = require("../database/schema");
+const express = require('express');
+const { Draft } = require('../database/schema');
 
 const router = express.Router();
 
-router.get("/", async (req, res) => {
+router.get('/', async (req, res) => {
   const drafts = await Draft.find({ author: req.user.sub }, { value: 0 })
     .sort({ _id: -1 })
-    .populate("author", "-password");
+    .populate('author', '-password');
   res.json(drafts);
 });
 
-router.post("/", async (req, res) => {
+router.post('/', async (req, res) => {
   const exisiting = await Draft.findById(req.body.id);
   if (!exisiting) {
     const draft = new Draft({ _id: req.body.id, author: req.user.sub });
@@ -19,14 +19,14 @@ router.post("/", async (req, res) => {
   }
   res.status(204).send({});
 });
-router.get("/:draftId", async (req, res) => {
+router.get('/:draftId', async (req, res) => {
   const draft = await Draft.findById(req.params.draftId).lean();
-  res.json(draft);
+  res.json(draft || {});
 });
 
-router.delete("/:draftId", async (req, res) => {
+router.delete('/:draftId', async (req, res) => {
   await Draft.findByIdAndRemove(req.params.draftId);
-  res.send("Success");
+  res.send({ id: req.params.draftId });
 });
 
 module.exports.default = router;
