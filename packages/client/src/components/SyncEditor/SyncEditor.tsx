@@ -23,6 +23,8 @@ import {
 } from "src/modules/draft/selector";
 import { AppState } from "src/modules/types";
 import { selectToken } from "src/modules/auth/selector";
+import ToolbarItem from "src/components/SyncEditor/Toolbar";
+import { TOOLBARS } from "./constants";
 
 interface Props extends PropsFromRedux {
   className: string;
@@ -122,8 +124,8 @@ const SyncEditor: React.FC<Props> = ({
       localEditorState.getSelection()
     );
   };
-  const handleBold = () => {
-    const state = RichUtils.toggleInlineStyle(getEditorState(), "BOLD");
+  const handleChangeStyle = (inlineStyle: string) => {
+    const state = RichUtils.toggleInlineStyle(getEditorState(), inlineStyle);
     handleChange(state);
     const raw = convertToRaw(state.getCurrentContent());
     broadcast({
@@ -134,38 +136,8 @@ const SyncEditor: React.FC<Props> = ({
       },
     });
   };
-  const handleItalic = () => {
-    const state = RichUtils.toggleInlineStyle(getEditorState(), "ITALIC");
-    handleChange(state);
-    const raw = convertToRaw(state.getCurrentContent());
-    broadcast({
-      type: "value",
-      data: {
-        value: raw,
-        editorId,
-      },
-    });
-  };
-  const handleBulletPoints = () => {
-    const state = RichUtils.toggleBlockType(
-      getEditorState(),
-      "unordered-list-item"
-    );
-    handleChange(state);
-    const raw = convertToRaw(state.getCurrentContent());
-    broadcast({
-      type: "value",
-      data: {
-        value: raw,
-        editorId,
-      },
-    });
-  };
-  const handleNumberedPoints = () => {
-    const state = RichUtils.toggleBlockType(
-      getEditorState(),
-      "ordered-list-item"
-    );
+  const handleChangeBlock = (blockType: string) => {
+    const state = RichUtils.toggleBlockType(getEditorState(), blockType);
     handleChange(state);
     const raw = convertToRaw(state.getCurrentContent());
     broadcast({
@@ -190,18 +162,19 @@ const SyncEditor: React.FC<Props> = ({
       </div>
       <div className={className}>
         <div className="flex">
-          <button className="mr-4 btn btn-gray" onClick={handleBold}>
-            B
-          </button>
-          <button onClick={handleItalic} className="mr-4 btn btn-gray">
-            I
-          </button>
-          <button className="mr-4 btn btn-gray" onClick={handleBulletPoints}>
-            Bullet points
-          </button>
-          <button className="mr-4 btn btn-gray" onClick={handleNumberedPoints}>
-            Numbered points
-          </button>
+          {TOOLBARS.map((tool) => (
+            <ToolbarItem
+              key={tool.label}
+              className="btn mx-2"
+              onClick={
+                tool.blockType
+                  ? () => handleChangeBlock(tool.blockType)
+                  : () => handleChangeStyle(tool.inlineStyle as string)
+              }
+              label={tool.label}
+              icon={tool.icon}
+            />
+          ))}
         </div>
         <Editor
           placeholder="Enter something amazing"
