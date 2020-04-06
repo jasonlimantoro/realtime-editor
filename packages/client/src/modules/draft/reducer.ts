@@ -64,8 +64,8 @@ const successReducer = (state = initialState, action: SuccessAction) => {
       } else {
         state.drafts[idx] = action.payload;
       }
-      state.editing.title = action.payload.title;
-      state.editing.value = action.payload.value;
+      state.editing.title = action.payload.title || "";
+      state.editing.value = action.payload.value || "";
     }
   }
 };
