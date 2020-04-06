@@ -34,6 +34,15 @@ const SyncEditor: React.FC<Props> = ({
     onChangeValue(state);
   };
 
+  const hasInlineStyle = (inlineStyle: string) => {
+    try {
+      const currentInlineStyle = editorState.getCurrentInlineStyle();
+      return currentInlineStyle.has(inlineStyle);
+    } catch {
+      return false;
+    }
+  };
+
   return (
     <div>
       <div>
@@ -49,9 +58,12 @@ const SyncEditor: React.FC<Props> = ({
         <div className="flex">
           {TOOLBARS.map((tool) => (
             <ToolbarItem
+              active={
+                tool.inlineStyle ? hasInlineStyle(tool.inlineStyle) : false
+              }
               key={tool.label}
               className="btn mx-2"
-              onClick={
+              onMouseDown={
                 tool.blockType
                   ? () => handleChangeBlock(tool.blockType)
                   : () => handleChangeStyle(tool.inlineStyle as string)
