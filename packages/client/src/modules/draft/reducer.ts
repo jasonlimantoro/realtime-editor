@@ -43,9 +43,8 @@ const successReducer = (state = initialState, action: SuccessAction) => {
       break;
 
     case Scope.create:
-      if (!isEmpty(action.payload)) {
-        state.drafts.push(action.payload);
-      }
+      if (isEmpty(action.payload)) return;
+      state.drafts.push(action.payload);
       break;
 
     case Scope.delete:
@@ -56,6 +55,7 @@ const successReducer = (state = initialState, action: SuccessAction) => {
       break;
 
     case Scope.detail: {
+      if (isEmpty(action.payload)) return;
       const idx = state.drafts.findIndex(
         ({ _id }) => _id === action.payload._id
       );
