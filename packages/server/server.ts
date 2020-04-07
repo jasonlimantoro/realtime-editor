@@ -13,9 +13,17 @@ const app = express();
 const server = http.createServer(app);
 app.use(morgan("common"));
 app.use(bodyParser.json());
+
+const whitelist = ["http://localhost:3000", "http://localhost:5000"];
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin(origin, callback) {
+      if (whitelist.indexOf(origin!) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
   })
 );
 
