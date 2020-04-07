@@ -1,7 +1,7 @@
 import { Document, model, Model, Schema } from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import config from "../../lib/config";
+import config from "lib/config";
 
 interface UserSchema extends Document {
   username: string;

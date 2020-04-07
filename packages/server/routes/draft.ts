@@ -1,5 +1,5 @@
 import express from "express";
-import { Draft } from "../database/schema";
+import { Draft } from "database/schema";
 
 const router = express.Router();
 
