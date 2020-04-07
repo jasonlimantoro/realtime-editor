@@ -5,6 +5,9 @@
     "husky": "^4.2.3",
     "lerna": "^3.20.2"
   },
+  "scripts": {
+    "start": "lerna run --concurrency 2 --stream start"
+  },
   "husky": {
     "hooks": {
       "pre-commit": "lerna run --concurrency 1 --stream precommit"
