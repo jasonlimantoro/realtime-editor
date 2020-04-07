@@ -45,7 +45,8 @@
     "watch:style": "yarn build:style --watch",
     "prebuild": "cross-env NODE_ENV=production yarn build:style",
     "postinstall": "patch-package",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "serve": "cp serve.json build && serve -l 5000 build"
   },
   "eslintConfig": {
     "extends": "react-app"
