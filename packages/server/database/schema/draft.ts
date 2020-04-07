@@ -1,7 +1,4 @@
-const mongoose = require("mongoose");
-
-const Schema = mongoose.Schema;
-const model = mongoose.model;
+import { Schema, model } from "mongoose";
 
 const draftSchema = new Schema(
   {
@@ -10,12 +7,12 @@ const draftSchema = new Schema(
     _id: String,
     author: {
       type: Schema.Types.ObjectId,
-      ref: "users"
-    }
+      ref: "users",
+    },
   },
   { versionKey: false }
 );
 
 const Draft = model("drafts", draftSchema);
 
-module.exports.default = Draft;
+export default Draft;
