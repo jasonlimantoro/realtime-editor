@@ -1,7 +1,7 @@
 import socket from "socket.io";
-import { server } from "server";
+import { server } from "@app/server";
 import jwt from "jsonwebtoken";
-import { Draft, User } from "database/schema";
+import { Draft, User } from "@app/database/schema";
 
 const io = socket(server);
 

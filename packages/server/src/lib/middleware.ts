@@ -1,6 +1,6 @@
 import expressJwt from "express-jwt";
 import config from "./config";
-import User from "database/schema/user";
+import User from "@app/database/schema/user";
 
 function jwt() {
   const secret = config.SECRET;

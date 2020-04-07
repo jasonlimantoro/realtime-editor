@@ -1,5 +1,5 @@
 import express from "express";
-import { User } from "database/schema";
+import { User } from "@app/database/schema";
 
 const router = express.Router();
 
