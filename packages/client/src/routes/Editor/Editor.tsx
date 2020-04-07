@@ -19,7 +19,7 @@ const Editor: React.FC<Props> = ({ create }) => {
       <Link className="underline" to="/editors">
         Leave Editor
       </Link>
-      <SyncEditorContainer className="p-8 bg-gray-200" editorId={editorId} />
+      <SyncEditorContainer editorId={editorId} />
     </div>
   );
 };

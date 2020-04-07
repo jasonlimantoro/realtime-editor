@@ -1,27 +1,17 @@
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { AppState } from "src/modules/types";
 import * as selectors from "src/modules/draft/selector";
 import { selectToken } from "src/modules/auth/selector";
 import * as actions from "src/modules/draft/action";
-import { convertToRaw, EditorState } from "draft-js";
 import throttle from "lodash/throttle";
 import SyncEditor from "./SyncEditor";
+import { createEditorStateFromString } from "./utils";
 
 interface Props extends PropsFromRedux {
   editorId: string;
-  className: string;
+  className?: string;
 }
-
-/**
- * Need to maintain the current SelectionState
- * No need to store it in internal state to bypass the additional rendering
- * Reference:
- * - https://github.com/facebook/draft-js/issues/700
- * - https://caffeinecoding.com/react-redux-draftjs/
- */
-
-let localEditorState = EditorState.createEmpty();
 
 const SyncEditorContainer: React.FC<Props> = ({
   editorId,
@@ -41,6 +31,16 @@ const SyncEditorContainer: React.FC<Props> = ({
   editingValue,
   broadcast,
 }) => {
+  const [editorState, setEditorState] = useState(
+    createEditorStateFromString(editingValue)
+  );
+  const prevRawState = useRef(editingValue);
+  useEffect(() => {
+    if (prevRawState.current !== editingValue) {
+      setEditorState(createEditorStateFromString(editingValue));
+      prevRawState.current = editingValue;
+    }
+  }, [editingValue]);
   useEffect(() => {
     detail(editorId);
   }, [detail, editorId]);
@@ -67,12 +67,11 @@ const SyncEditorContainer: React.FC<Props> = ({
     listenCollaboratorChange,
   ]);
 
-  const saveEditor = (editorState: EditorState) => {
-    const raw = convertToRaw(editorState.getCurrentContent());
+  const saveEditor = (editorState: any) => {
     broadcast({
       type: "value",
       data: {
-        value: raw,
+        value: editorState,
         editorId,
       },
     });
@@ -98,19 +97,14 @@ const SyncEditorContainer: React.FC<Props> = ({
     [setEditingTitle, throttledSaveTitle]
   );
   const handleChangeValue = useCallback(
-    (editorState: EditorState) => {
-      localEditorState = editorState;
-      setEditingValue(convertToRaw(editorState.getCurrentContent()));
-      throttledSave(editorState);
+    (value: any, raw) => {
+      setEditingValue(value);
+      setEditorState(raw);
+      prevRawState.current = value;
+      throttledSave(value);
     },
     [setEditingValue, throttledSave]
   );
-  const editorState = useMemo(() => {
-    return EditorState.acceptSelection(
-      editingValue,
-      localEditorState.getSelection()
-    );
-  }, [editingValue]);
 
   return (
     <SyncEditor

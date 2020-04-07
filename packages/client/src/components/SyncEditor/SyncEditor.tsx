@@ -1,16 +1,13 @@
 import React from "react";
-import "draft-js/dist/Draft.css";
-import { Editor, EditorState, RichUtils } from "draft-js";
-import ToolbarItem from "src/components/SyncEditor/Toolbar";
-import { TOOLBARS } from "./constants";
+import RichTextEditor, { EditorValue } from "react-rte";
 
 interface Props {
-  className: string;
+  className?: string;
   onChangeTitle: (title: string) => void;
-  onChangeValue: (value: any) => void;
+  onChangeValue: (value: any, raw: EditorValue) => void;
   editingTitle: string;
   collaborators: string[];
-  editorState: EditorState;
+  editorState: EditorValue;
 }
 
 const SyncEditor: React.FC<Props> = ({
@@ -24,23 +21,8 @@ const SyncEditor: React.FC<Props> = ({
   const handleChangeTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChangeTitle(e.target.value);
   };
-
-  const handleChangeStyle = (inlineStyle: string) => {
-    const state = RichUtils.toggleInlineStyle(editorState, inlineStyle);
-    onChangeValue(state);
-  };
-  const handleChangeBlock = (blockType: string) => {
-    const state = RichUtils.toggleBlockType(editorState, blockType);
-    onChangeValue(state);
-  };
-
-  const hasInlineStyle = (inlineStyle: string) => {
-    try {
-      const currentInlineStyle = editorState.getCurrentInlineStyle();
-      return currentInlineStyle.has(inlineStyle);
-    } catch {
-      return false;
-    }
+  const handleChangeValue = (value: EditorValue) => {
+    onChangeValue(value.toString("markdown"), value);
   };
 
   return (
@@ -55,28 +37,10 @@ const SyncEditor: React.FC<Props> = ({
         />
       </div>
       <div className={className}>
-        <div className="flex">
-          {TOOLBARS.map((tool) => (
-            <ToolbarItem
-              active={
-                tool.inlineStyle ? hasInlineStyle(tool.inlineStyle) : false
-              }
-              key={tool.label}
-              className="btn mx-2"
-              onMouseDown={
-                tool.blockType
-                  ? () => handleChangeBlock(tool.blockType)
-                  : () => handleChangeStyle(tool.inlineStyle as string)
-              }
-              label={tool.label}
-              icon={tool.icon}
-            />
-          ))}
-        </div>
-        <Editor
+        <RichTextEditor
           placeholder="Enter something amazing"
-          editorState={editorState}
-          onChange={onChangeValue}
+          value={editorState}
+          onChange={handleChangeValue}
         />
       </div>
       <div>
