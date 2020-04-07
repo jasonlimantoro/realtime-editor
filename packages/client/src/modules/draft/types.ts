@@ -1,5 +1,4 @@
 import { DraftSchema } from "src/lib/entities/draft";
-import { RawDraftContentState } from "draft-js";
 
 export interface State {
   drafts: DraftSchema[];
@@ -149,7 +148,7 @@ export interface SetEditingTitle {
 }
 export interface SetEditingValue {
   type: DraftActionTypes.SET_EDITING_VALUE;
-  payload: RawDraftContentState;
+  payload: any;
 }
 export interface SubscribeEditingTitle {
   type: DraftActionTypes.SUBSCRIBE_EDITING_TITLE;
@@ -158,7 +157,7 @@ export interface SubscribeEditingTitle {
 
 export interface SubscribeEditingValue {
   type: DraftActionTypes.SUBSCRIBE_EDITING_VALUE;
-  payload: RawDraftContentState;
+  payload: any;
 }
 
 export interface Unsubscribe {

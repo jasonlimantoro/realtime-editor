@@ -1,6 +1,5 @@
 import { serviceRegistry } from "src/lib/services/registry";
 import { Dispatch } from "redux";
-import { RawDraftContentState } from "draft-js";
 import { crudActions } from "src/lib/redux-utils";
 import {
   ClearEditing,
@@ -105,9 +104,7 @@ export const setEditingTitle = (title: string): SetEditingTitle => ({
   payload: title,
 });
 
-export const setEditingValue = (
-  value: RawDraftContentState
-): SetEditingValue => ({
+export const setEditingValue = (value: any): SetEditingValue => ({
   type: DraftActionTypes.SET_EDITING_VALUE,
   payload: value,
 });

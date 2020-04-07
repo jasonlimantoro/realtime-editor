@@ -25,7 +25,7 @@ const initialState: State = {
   broadcastError: {},
   editing: {
     title: "",
-    value: null,
+    value: "",
     collaborators: {},
   },
 };
