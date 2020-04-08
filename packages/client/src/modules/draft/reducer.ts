@@ -1,4 +1,4 @@
-import produce from "immer";
+import produce, { Draft } from "immer";
 import isEmpty from "lodash/isEmpty";
 import {
   CreateSuccessAction,
@@ -71,6 +71,14 @@ const successReducer = (state = initialState, action: SuccessAction) => {
     }
   }
 };
+
+const editingReducer = (draft: Draft<State>, action: any) => {
+  if (/^DRAFT\/(SET|SUBSCRIBE)_EDITING*/.test(action.type)) {
+    draft.editing[action.field] = action.payload;
+  } else if (action.type === DraftActionTypes.CLEAR_EDITING_STATE) {
+    draft.editing = initialState.editing;
+  }
+};
 const reducer = (state = initialState, action: DraftAction) =>
   produce(state, (draft) => {
     switch (action.type) {
@@ -88,25 +96,6 @@ const reducer = (state = initialState, action: DraftAction) =>
         draft[`${action.scope}Error`] = action.payload;
         break;
 
-      case DraftActionTypes.SET_EDITING_TITLE:
-      case DraftActionTypes.SUBSCRIBE_EDITING_TITLE:
-        draft.editing.title = action.payload;
-        break;
-
-      case DraftActionTypes.SET_EDITING_VALUE:
-      case DraftActionTypes.SUBSCRIBE_EDITING_VALUE:
-        draft.editing.value = action.payload;
-        break;
-
-      case DraftActionTypes.SET_EDITING_TIMESTAMP:
-      case DraftActionTypes.SUBSCRIBE_EDITING_TIMESTAMP:
-        draft.editing.timestamp = action.payload;
-        break;
-
-      case DraftActionTypes.CLEAR_EDITING_STATE:
-        draft.editing = initialState.editing;
-        break;
-
       case DraftActionTypes.SUBSCRIBE_NEW_COLLABORATOR:
         draft.editing.collaborators = action.payload.collaborators;
         break;
@@ -114,6 +103,8 @@ const reducer = (state = initialState, action: DraftAction) =>
       case DraftActionTypes.SUBSCRIBE_REMOVE_COLLABORATOR:
         delete draft.editing.collaborators[action.payload.user];
         break;
+      default:
+        editingReducer(draft, action);
     }
   });
 

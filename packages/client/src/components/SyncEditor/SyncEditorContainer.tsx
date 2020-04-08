@@ -23,8 +23,7 @@ const SyncEditorContainer: React.FC<Props> = ({
   listenCollaboratorChange,
   clearEditingValue,
   unsubscribe,
-  setEditingTitle,
-  setEditingValue,
+  setEditingState,
   className,
   collaborators,
   editingTitle,
@@ -92,19 +91,19 @@ const SyncEditorContainer: React.FC<Props> = ({
 
   const handleChangeTitle = useCallback(
     (title: string) => {
-      setEditingTitle(title);
+      setEditingState("title", title);
       throttledSaveTitle(title);
     },
-    [setEditingTitle, throttledSaveTitle]
+    [setEditingState, throttledSaveTitle]
   );
   const handleChangeValue = useCallback(
     (value: any, raw) => {
-      setEditingValue(value);
+      setEditingState("value", value);
       setEditorState(raw);
       prevRawState.current = value;
       throttledSave(value);
     },
-    [setEditingValue, throttledSave]
+    [setEditingState, throttledSave]
   );
 
   return (
@@ -133,8 +132,7 @@ const mapDispatchToProps = {
   broadcast: actions.broadcast,
   unsubscribe: actions.unsubscribe,
   clearEditingValue: actions.clearEditingValue,
-  setEditingTitle: actions.setEditingTitle,
-  setEditingValue: actions.setEditingValue,
+  setEditingState: actions.setEditingState,
   listenCollaboratorChange: actions.listenCollaboratorChange,
   listenEditorStateChange: actions.listenEditorStateChange,
   join: actions.join,

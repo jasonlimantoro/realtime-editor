@@ -5,12 +5,9 @@ import {
   ClearEditing,
   DraftAction,
   DraftActionTypes,
+  EditingAction,
+  EditingField,
   Scope,
-  SetEditingTitle,
-  SetEditingValue,
-  SubscribeEditingTimestamp,
-  SubscribeEditingTitle,
-  SubscribeEditingValue,
   Unsubscribe,
 } from "./types";
 
@@ -100,40 +97,33 @@ export const clearEditingValue = (): ClearEditing => ({
   type: DraftActionTypes.CLEAR_EDITING_STATE,
 });
 
-export const setEditingTitle = (title: string): SetEditingTitle => ({
-  type: DraftActionTypes.SET_EDITING_TITLE,
-  payload: title,
-});
-
-export const setEditingValue = (value: any): SetEditingValue => ({
-  type: DraftActionTypes.SET_EDITING_VALUE,
+export const setEditingState = (
+  field: EditingField,
+  value: any
+): EditingAction => ({
+  type: Object(DraftActionTypes)[`SET_EDITING_${field.toUpperCase()}`],
   payload: value,
+  field,
 });
 
-const subscribeEditingTitle = (title: string): SubscribeEditingTitle => ({
-  type: DraftActionTypes.SUBSCRIBE_EDITING_TITLE,
-  payload: title,
-});
-
-const subscribeEditingValue = (value: any): SubscribeEditingValue => ({
-  type: DraftActionTypes.SUBSCRIBE_EDITING_VALUE,
+const subscribeEditingState = (
+  field: EditingField,
+  value: any
+): EditingAction => ({
+  type: Object(DraftActionTypes)[`SUBSCRIBE_EDITING_${field.toUpperCase()}`],
   payload: value,
-});
-
-const subscribeEditingTimestamp = (value: any): SubscribeEditingTimestamp => ({
-  type: DraftActionTypes.SUBSCRIBE_EDITING_TIMESTAMP,
-  payload: value,
+  field,
 });
 
 export const listenEditorStateChange = () => (dispatch: Dispatch) => {
   service.listenState((data: any) => {
-    dispatch(subscribeEditingValue(data.value));
+    dispatch(subscribeEditingState("value", data.value));
   });
   service.listenTitle((data: any) => {
-    dispatch(subscribeEditingTitle(data.title));
+    dispatch(subscribeEditingState("title", data.title));
   });
   service.listenTimestamp((data: any) => {
-    dispatch(subscribeEditingTimestamp(data.updatedAt));
+    dispatch(subscribeEditingState("timestamp", data.updatedAt));
   });
 };
 export const listenCollaboratorChange = () => (dispatch: Dispatch) => {
