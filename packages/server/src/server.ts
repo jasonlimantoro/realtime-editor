@@ -1,4 +1,5 @@
 import express from "express";
+require("dotenv").config();
 import cors from "cors";
 import http from "http";
 import bodyParser from "body-parser";
@@ -7,7 +8,7 @@ import "express-async-errors";
 import "./database";
 import { errorHandler } from "./lib/middleware";
 
-const port = 4000;
+const port = process.env.PORT || 4000;
 
 const app = express();
 const server = http.createServer(app);
@@ -29,7 +30,7 @@ app.use(
 
 app.get("/", (req, res) => res.send("Hello World!"));
 
-app.use("/api", require("./routes").default);
+app.use(require("./routes").default);
 
 app.use(errorHandler);
 

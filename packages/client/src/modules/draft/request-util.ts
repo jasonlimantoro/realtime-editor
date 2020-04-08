@@ -12,7 +12,7 @@ export default class DraftServiceUtil extends RequestUtilService {
       reconnectionAttempts: MAX_RECONNECTION_ATTEMPTS,
     });
     this.socket.on("error", (err: any) => {
-      console.log(err);
+      console.error(err);
     });
     this.socket.on("disconnect", (reason: string) => {
       console.log("DISCONNECTED", reason);
