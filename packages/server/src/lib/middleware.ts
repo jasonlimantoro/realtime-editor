@@ -1,6 +1,7 @@
 import expressJwt from "express-jwt";
 import config from "./config";
 import User from "@app/database/schema/user";
+import { NextFunction, Request, Response } from "express";
 
 function jwt() {
   const secret = config.SECRET;
@@ -19,7 +20,12 @@ function jwt() {
     },
   });
 }
-const errorHandler = (err: any, req: any, res: any, _next: any) => {
+const errorHandler = (
+  err: any,
+  req: Request,
+  res: Response,
+  _next: NextFunction
+) => {
   // eslint-disable-next-line no-console
   console.error(err);
   if (typeof err === "string") {
