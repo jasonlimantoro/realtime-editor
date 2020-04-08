@@ -29,4 +29,4 @@ router.delete("/:draftId", async (req, res) => {
   res.send({ id: req.params.draftId });
 });
 
-module.exports.default = router;
+export default router;
