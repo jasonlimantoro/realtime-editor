@@ -1,5 +1,7 @@
 import React from "react";
+import cls from "classnames";
 import RichTextEditor, { EditorValue } from "react-rte";
+import Collaborators from "./Collaborators";
 
 interface Props {
   className?: string;
@@ -26,8 +28,8 @@ const SyncEditor: React.FC<Props> = ({
   };
 
   return (
-    <div>
-      <div>
+    <div className={cls("h-full", className)}>
+      <div className="mb-4">
         <input
           className="w-full text-2xl"
           placeholder="Untitled"
@@ -36,29 +38,20 @@ const SyncEditor: React.FC<Props> = ({
           onChange={handleChangeTitle}
         />
       </div>
-      <div className={className}>
-        <RichTextEditor
-          placeholder="Enter something amazing"
-          value={editorState}
-          onChange={handleChangeValue}
-        />
-      </div>
-      <div>
-        <p className="text-xl">
-          Collaborators: You{" "}
-          {collaborators.length ? (
-            <span>and {collaborators.length} others</span>
-          ) : (
-            <span>only</span>
-          )}
-        </p>
-        <ul>
-          {collaborators.map((c, idx) => (
-            <li key={idx}>
-              {c} <span className="italic text-gray-700">is collaborating</span>
-            </li>
-          ))}
-        </ul>
+      <div className="flex h-full">
+        <div className="w-3/4 h-full">
+          <RichTextEditor
+            editorClassName="font-sans p-4 shadow-xl"
+            placeholder="Enter something amazing"
+            value={editorState}
+            onChange={handleChangeValue}
+          />
+        </div>
+        <div className="w-1/4 ml-4 h-full">
+          <div className="p-4 h-full">
+            <Collaborators collaborators={collaborators} />
+          </div>
+        </div>
       </div>
     </div>
   );

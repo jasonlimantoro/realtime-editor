@@ -15,11 +15,13 @@ const Editor: React.FC<Props> = ({ create }) => {
     create({ id: editorId });
   }, [create, editorId]);
   return (
-    <div className="p-8">
+    <div className="p-8 h-full">
       <Link className="underline" to="/editors">
         Leave Editor
       </Link>
-      <SyncEditorContainer editorId={editorId} />
+      <div className="h-full">
+        <SyncEditorContainer editorId={editorId} />
+      </div>
     </div>
   );
 };
