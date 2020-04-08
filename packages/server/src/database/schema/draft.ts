@@ -1,7 +1,7 @@
 import { Schema, model, Model, Document } from "mongoose";
 
 interface DraftSchema extends Document {
-  value: any;
+  value: string;
   title: string;
   author: any;
   updatedAt: Date;
@@ -9,7 +9,7 @@ interface DraftSchema extends Document {
 
 const draftSchema = new Schema(
   {
-    value: Object,
+    value: String,
     title: { type: String, default: "Untitled" },
     _id: String,
     author: {
