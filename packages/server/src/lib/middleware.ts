@@ -45,9 +45,7 @@ const errorHandler = (
         .status(401)
         .json({ message: "Token expired", code: "token_expired" });
     }
-    return res
-      .status(401)
-      .json({ message: "Invalid Token", code: "token_invalid" });
+    return res.status(401).json({ message: err.message, code: err.code });
   }
 
   // default to 500 server error
