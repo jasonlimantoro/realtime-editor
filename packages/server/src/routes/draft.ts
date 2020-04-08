@@ -4,9 +4,10 @@ import { Draft } from "@app/database/schema";
 const router = express.Router();
 
 router.get("/", async (req: any, res) => {
-  const drafts = await Draft.find({ author: req.user.sub }, { value: 0 })
+  const drafts = await Draft.find({ author: req.user.sub })
     .sort({ _id: -1 })
-    .populate("author", "-password");
+    .populate("author", "-password")
+    .lean();
   res.json(drafts);
 });
 
