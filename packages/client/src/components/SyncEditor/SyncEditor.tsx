@@ -1,5 +1,6 @@
 import React from "react";
 import cls from "classnames";
+import moment from "moment";
 import RichTextEditor, { EditorValue } from "react-rte";
 import Collaborators from "./Collaborators";
 
@@ -8,6 +9,7 @@ interface Props {
   onChangeTitle: (title: string) => void;
   onChangeValue: (value: any, raw: EditorValue) => void;
   editingTitle: string;
+  timestamp: any;
   collaborators: string[];
   editorState: EditorValue;
 }
@@ -19,6 +21,7 @@ const SyncEditor: React.FC<Props> = ({
   editingTitle,
   collaborators,
   editorState,
+  timestamp,
 }) => {
   const handleChangeTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChangeTitle(e.target.value);
@@ -29,6 +32,9 @@ const SyncEditor: React.FC<Props> = ({
 
   return (
     <div className={cls("h-full", className)}>
+      <p className="text-gray-600">
+        Last updated at {timestamp && moment(timestamp).calendar()}
+      </p>
       <div className="mb-4">
         <input
           className="w-full text-2xl"

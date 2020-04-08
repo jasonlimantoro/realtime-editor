@@ -44,6 +44,10 @@ export const selectEditingValue = createSelector(selectEditing, (state) => {
   return state.value;
 });
 
+export const selectTimeStamp = createSelector(selectEditing, (state) => {
+  return state.timestamp;
+});
+
 export const selectCollaborators = createSelector(
   selectEditing,
   selectLoggedInUser,

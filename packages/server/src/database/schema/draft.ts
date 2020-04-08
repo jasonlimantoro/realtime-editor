@@ -1,4 +1,11 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, Model, Document } from "mongoose";
+
+interface DraftSchema extends Document {
+  value: any;
+  title: string;
+  author: any;
+  updatedAt: Date;
+}
 
 const draftSchema = new Schema(
   {
@@ -10,9 +17,14 @@ const draftSchema = new Schema(
       ref: "users",
     },
   },
-  { versionKey: false }
+  {
+    versionKey: false,
+    timestamps: {
+      updatedAt: "updatedAt",
+    },
+  }
 );
 
-const Draft = model("drafts", draftSchema);
+const Draft = model<DraftSchema, Model<DraftSchema>>("drafts", draftSchema);
 
 export default Draft;

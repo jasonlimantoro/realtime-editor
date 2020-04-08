@@ -5,4 +5,5 @@ export interface DraftSchema {
   author: {
     username: string;
   };
+  updatedAt: string;
 }

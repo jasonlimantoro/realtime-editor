@@ -15,6 +15,7 @@ export interface State {
   editing: {
     title: string;
     value: any;
+    timestamp: any;
     collaborators: {
       [key: string]: string;
     };
@@ -42,9 +43,11 @@ export enum DraftActionTypes {
 
   SET_EDITING_TITLE = "DRAFT/SET_EDITING_TITLE",
   SET_EDITING_VALUE = "DRAFT/SET_EDITING_VALUE",
+  SET_EDITING_TIMESTAMP = "DRAFT/SET_EDITING_TIMESTAMP",
 
   SUBSCRIBE_EDITING_TITLE = "DRAFT/SUBSCRIBE_EDITING_TITLE",
   SUBSCRIBE_EDITING_VALUE = "DRAFT/SUBSCRIBE_EDITING_VALUE",
+  SUBSCRIBE_EDITING_TIMESTAMP = "DRAFT/SUBSCRIBE_EDITING_TIMESTAMP",
   SUBSCRIBE_NEW_COLLABORATOR = "DRAFT/SUBSCRIBE_NEW_COLLABORATOR",
   SUBSCRIBE_REMOVE_COLLABORATOR = "DRAFT/SUBSCRIBE_REMOVE_COLLABORATOR",
   UNSUBSCRIBE = "DRAFT/UNSUBSCRIBE",
@@ -150,9 +153,20 @@ export interface SetEditingValue {
   type: DraftActionTypes.SET_EDITING_VALUE;
   payload: any;
 }
+
+export interface SetEditingTimestamp {
+  type: DraftActionTypes.SET_EDITING_TIMESTAMP;
+  payload: any;
+}
+
 export interface SubscribeEditingTitle {
   type: DraftActionTypes.SUBSCRIBE_EDITING_TITLE;
   payload: string;
+}
+
+export interface SubscribeEditingTimestamp {
+  type: DraftActionTypes.SUBSCRIBE_EDITING_TIMESTAMP;
+  payload: any;
 }
 
 export interface SubscribeEditingValue {
@@ -213,6 +227,7 @@ type EditingAction =
   | SubscribeEditingValue
   | SetEditingValue
   | SetEditingTitle
+  | SetEditingTimestamp
   | ClearEditing;
 
 type UnsubscribeAction = Unsubscribe;
@@ -221,7 +236,8 @@ type SubscribeAction =
   | SubscribeNewCollaborator
   | SubscribeRemoveCollaborator
   | SubscribeEditingTitle
-  | SubscribeEditingValue;
+  | SubscribeEditingValue
+  | SubscribeEditingTimestamp;
 
 export type DraftAction =
   | ListAction

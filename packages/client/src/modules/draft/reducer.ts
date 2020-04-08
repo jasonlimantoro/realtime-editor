@@ -1,14 +1,14 @@
 import produce from "immer";
 import isEmpty from "lodash/isEmpty";
 import {
-  State,
-  DraftAction,
-  DraftActionTypes,
-  Scope,
-  ListSuccessAction,
   CreateSuccessAction,
   DeleteSuccessAction,
   DetailSuccessAction,
+  DraftAction,
+  DraftActionTypes,
+  ListSuccessAction,
+  Scope,
+  State,
 } from "./types";
 
 const initialState: State = {
@@ -26,6 +26,7 @@ const initialState: State = {
   editing: {
     title: "",
     value: "",
+    timestamp: "",
     collaborators: {},
   },
 };
@@ -66,6 +67,7 @@ const successReducer = (state = initialState, action: SuccessAction) => {
       }
       state.editing.title = action.payload.title || "";
       state.editing.value = action.payload.value || "";
+      state.editing.timestamp = action.payload.updatedAt || "";
     }
   }
 };
@@ -95,6 +97,12 @@ const reducer = (state = initialState, action: DraftAction) =>
       case DraftActionTypes.SUBSCRIBE_EDITING_VALUE:
         draft.editing.value = action.payload;
         break;
+
+      case DraftActionTypes.SET_EDITING_TIMESTAMP:
+      case DraftActionTypes.SUBSCRIBE_EDITING_TIMESTAMP:
+        draft.editing.timestamp = action.payload;
+        break;
+
       case DraftActionTypes.CLEAR_EDITING_STATE:
         draft.editing = initialState.editing;
         break;

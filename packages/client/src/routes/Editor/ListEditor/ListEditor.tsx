@@ -53,7 +53,9 @@ const ListEditor: React.FC<Props> = ({
                     <p className="ml-4">
                       created at {moment(Number(v._id)).format("HH:mm")}
                     </p>
-                    <p className="ml-4">Created by {v.author.username}</p>
+                    <p className="ml-4">
+                      last updated at {moment(v.updatedAt).calendar()}
+                    </p>
                     <button className="ml-4" onClick={() => remove(v._id)}>
                       Delete
                     </button>

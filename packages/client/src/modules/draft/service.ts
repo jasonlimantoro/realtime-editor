@@ -17,6 +17,8 @@ export default class DraftService extends BaseService {
 
   REMOVE_COLLABORATOR = "REMOVE_COLLABORATOR";
 
+  TIMESTAMP_LISTENER = "TIMESTAMP_LISTENER";
+
   update: any;
 
   list = () => this.requestUtil.request({ path: "drafts" });
@@ -54,4 +56,7 @@ export default class DraftService extends BaseService {
 
   listenRemoveCollaborator = (cb: any) =>
     this.requestUtil.listen(this.REMOVE_COLLABORATOR, cb);
+
+  listenTimestamp = (cb: any) =>
+    this.requestUtil.listen(this.TIMESTAMP_LISTENER, cb);
 }

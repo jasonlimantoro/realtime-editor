@@ -8,6 +8,7 @@ import {
   Scope,
   SetEditingTitle,
   SetEditingValue,
+  SubscribeEditingTimestamp,
   SubscribeEditingTitle,
   SubscribeEditingValue,
   Unsubscribe,
@@ -119,12 +120,20 @@ const subscribeEditingValue = (value: any): SubscribeEditingValue => ({
   payload: value,
 });
 
+const subscribeEditingTimestamp = (value: any): SubscribeEditingTimestamp => ({
+  type: DraftActionTypes.SUBSCRIBE_EDITING_TIMESTAMP,
+  payload: value,
+});
+
 export const listenEditorStateChange = () => (dispatch: Dispatch) => {
   service.listenState((data: any) => {
     dispatch(subscribeEditingValue(data.value));
   });
   service.listenTitle((data: any) => {
     dispatch(subscribeEditingTitle(data.title));
+  });
+  service.listenTimestamp((data: any) => {
+    dispatch(subscribeEditingTimestamp(data.updatedAt));
   });
 };
 export const listenCollaboratorChange = () => (dispatch: Dispatch) => {

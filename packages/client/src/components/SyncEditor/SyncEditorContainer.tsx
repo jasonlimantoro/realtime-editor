@@ -30,6 +30,7 @@ const SyncEditorContainer: React.FC<Props> = ({
   editingTitle,
   editingValue,
   broadcast,
+  timestamp,
 }) => {
   const [editorState, setEditorState] = useState(
     createEditorStateFromString(editingValue)
@@ -114,6 +115,7 @@ const SyncEditorContainer: React.FC<Props> = ({
       editorState={editorState}
       collaborators={collaborators}
       editingTitle={editingTitle}
+      timestamp={timestamp}
     />
   );
 };
@@ -122,6 +124,7 @@ const mapStateToProps = (state: AppState) => ({
   editingTitle: selectors.selectEditingTitle(state),
   editingValue: selectors.selectEditingValue(state),
   collaborators: selectors.selectCollaborators(state),
+  timestamp: selectors.selectTimeStamp(state),
   token: selectToken(state),
 });
 

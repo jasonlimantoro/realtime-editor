@@ -35,12 +35,15 @@ io.on("connection", function (socket) {
     });
   });
   socket.on("CHANGE_STATE", async (data) => {
-    await Draft.findByIdAndUpdate(
+    const newDraft = await Draft.findByIdAndUpdate(
       data.editorId,
       { value: data.value },
       { upsert: true, setDefaultsOnInsert: true }
     );
     socket.broadcast.to(data.editorId).emit("CHANGE_STATE_LISTENER", data);
+    io.to(data.editorId).emit("TIMESTAMP_LISTENER", {
+      updatedAt: newDraft!.updatedAt,
+    });
   });
 
   socket.on("CHANGE_TITLE", async (data) => {
