@@ -3,7 +3,6 @@ import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import moment from "moment";
 import { DraftSchema } from "src/lib/entities/draft";
-import { ellipsis } from "src/lib/utils";
 import { AppState } from "src/modules/types";
 import { logout } from "src/modules/auth/action";
 import { crud } from "src/modules/draft/action";
@@ -29,7 +28,7 @@ const ListEditor: React.FC<Props> = ({
     list();
   }, [list]);
   return (
-    <div>
+    <div className="px-6">
       <h2 className="text-3xl">Welcome {username}!</h2>
       <h2 className="text-xl">Total Drafts ({draftCount})</h2>
       <Link className="inline-block btn btn-gray" to="/editor">
@@ -43,26 +42,30 @@ const ListEditor: React.FC<Props> = ({
         return (
           <div key={k} className="mt-4">
             <p className="text-2xl">{k}</p>
-            <ul>
+            <div className="grid grid-cols-3 gap-4">
               {value.map((v: DraftSchema) => (
-                <li key={v._id}>
-                  <div className="flex">
-                    <Link className="underline" to={`/editor/${v._id}`}>
-                      {ellipsis(v.title)}
+                <div key={v._id} className="rounded shadow-lg">
+                  <div className="px-6 py-4 flex-col">
+                    <Link
+                      className="text-gray-700 font-bold text-xl"
+                      to={`/editor/${v._id}`}
+                    >
+                      {v.title}
                     </Link>
-                    <p className="ml-4">
-                      created at {moment(Number(v._id)).format("HH:mm")}
-                    </p>
-                    <p className="ml-4">
-                      last updated at {moment(v.updatedAt).calendar()}
-                    </p>
-                    <button className="ml-4" onClick={() => remove(v._id)}>
+                    <div className="text-base text-gray-800">
+                      <p>created at {moment(Number(v._id)).format("HH:mm")}</p>
+                      <p>updated at {moment(v.updatedAt).calendar()}</p>
+                    </div>
+                    <button
+                      className="btn btn-red"
+                      onClick={() => remove(v._id)}
+                    >
                       Delete
                     </button>
                   </div>
-                </li>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
         );
       })}

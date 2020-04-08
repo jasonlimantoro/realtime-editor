@@ -12,6 +12,13 @@
   }
 }
 
+.btn-red {
+  @apply bg-red-700 text-white;
+  &:hover {
+    @apply bg-red-800;
+  }
+}
+
 html,
 body,
 #root {
