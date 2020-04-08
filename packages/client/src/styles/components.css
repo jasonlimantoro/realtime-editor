@@ -6,11 +6,12 @@
 }
 
 .btn-gray {
-  @apply bg-gray-400;
+  @apply bg-gray-700 text-white;
+  &:hover {
+    @apply bg-gray-800;
+  }
 }
-.btn-gray:hover {
-  @apply bg-gray-500;
-}
+
 html,
 body,
 #root {
