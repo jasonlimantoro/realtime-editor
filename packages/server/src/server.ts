@@ -15,7 +15,11 @@ const server = http.createServer(app);
 app.use(morgan("common"));
 app.use(bodyParser.json());
 
-const whitelist = ["http://localhost:3000", "http://localhost:5000"];
+const whitelist = [
+  "http://localhost:3000",
+  "http://localhost:5000",
+  "https://eloquent-bardeen-8200f1.netlify.com",
+];
 app.use(
   cors({
     origin(origin, callback) {
