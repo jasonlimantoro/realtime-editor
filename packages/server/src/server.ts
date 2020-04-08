@@ -18,7 +18,7 @@ app.use(bodyParser.json());
 const whitelist = [
   "http://localhost:3000",
   "http://localhost:5000",
-  "https://eloquent-bardeen-8200f1.netlify.com",
+  process.env.FRONTEND_ORIGIN,
 ];
 app.use(
   cors({
