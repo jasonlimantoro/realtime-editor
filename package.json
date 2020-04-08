@@ -6,7 +6,8 @@
     "lerna": "^3.20.2"
   },
   "scripts": {
-    "start": "lerna run --concurrency 2 --stream start"
+    "start": "lerna run --concurrency 2 --stream start",
+    "publish:server": "git subtree push --prefix packages/server heroku master"
   },
   "husky": {
     "hooks": {
