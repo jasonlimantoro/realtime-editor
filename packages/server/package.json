@@ -18,7 +18,9 @@
   "scripts": {
     "start": "nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
     "precommit": "lint-staged",
-    "build:babel": "NODE_ENV=production babel src --out-dir build --extensions '.ts'"
+    "clean": "rm -rf build && mkdir build",
+    "build:babel": "NODE_ENV=production babel src --out-dir build --extensions '.ts'",
+    "build": "yarn clean && yarn build:babel"
   },
   "lint-staged": {
     "*.{js,jsx,css}": [
