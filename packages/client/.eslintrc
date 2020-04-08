@@ -96,6 +96,7 @@
     "arrow-body-style": "off",
     "no-underscore-dangle": "off",
     "spaced-comment": "off",
-    "no-console": "error"
+    "no-console": "error",
+    "prettier/prettier": "error"
   }
 }
