@@ -27,6 +27,12 @@ const ListEditor: React.FC<Props> = ({
   useEffect(() => {
     list();
   }, [list]);
+  const handleDelete = (id: string) => {
+    // eslint-disable-next-line no-restricted-globals,no-alert
+    if (!confirm("Are you sure you want to delete this?")) return;
+    remove(id);
+  };
+
   return (
     <div className="px-6">
       <h2 className="text-3xl">Welcome {username}!</h2>
@@ -58,7 +64,7 @@ const ListEditor: React.FC<Props> = ({
                     </div>
                     <button
                       className="btn btn-red"
-                      onClick={() => remove(v._id)}
+                      onClick={() => handleDelete(v._id)}
                     >
                       Delete
                     </button>
