@@ -4,7 +4,9 @@ import { AppState } from "src/modules/types";
 import * as selectors from "src/modules/draft/selector";
 import { selectToken } from "src/modules/auth/selector";
 import * as actions from "src/modules/draft/action";
-import throttle from "lodash/throttle";
+import { observer } from "mobx-react";
+import { IDraft } from "src/modules/draft/models/Draft.model";
+import { useMst } from "src/modules/root";
 import SyncEditor from "./SyncEditor";
 import { createEditorStateFromString } from "./utils";
 
@@ -16,34 +18,35 @@ interface Props extends PropsFromRedux {
 const SyncEditorContainer: React.FC<Props> = ({
   editorId,
   token,
-  detail,
   join,
   leave,
   listenEditorStateChange,
   listenCollaboratorChange,
   clearEditingValue,
   unsubscribe,
-  setEditingState,
   className,
   collaborators,
-  editingTitle,
-  editingValue,
-  broadcast,
-  timestamp,
 }) => {
+  const {
+    drafts: { detailDraft, draftById },
+  } = useMst();
+  const { broadcastTitle, title, broadcastValue, value, updatedAt } = draftById(
+    editorId
+  ) as IDraft;
+
   const [editorState, setEditorState] = useState(
-    createEditorStateFromString(editingValue)
+    createEditorStateFromString(value || "")
   );
-  const prevRawState = useRef(editingValue);
+  const prevRawState = useRef(value);
   useEffect(() => {
-    if (prevRawState.current !== editingValue) {
-      setEditorState(createEditorStateFromString(editingValue));
-      prevRawState.current = editingValue;
+    if (prevRawState.current !== value) {
+      setEditorState(createEditorStateFromString(value));
+      prevRawState.current = value;
     }
-  }, [editingValue]);
+  }, [value]);
   useEffect(() => {
-    detail(editorId);
-  }, [detail, editorId]);
+    detailDraft(editorId);
+  }, [detailDraft, editorId]);
 
   useEffect(() => {
     const payload = { room: editorId, meta: { token } };
@@ -67,45 +70,20 @@ const SyncEditorContainer: React.FC<Props> = ({
     listenCollaboratorChange,
   ]);
 
-  const saveEditor = (editorState: any) => {
-    broadcast({
-      type: "value",
-      data: {
-        value: editorState,
-        editorId,
-      },
-    });
-  };
-  const saveTitle = (title: string) => {
-    broadcast({
-      type: "title",
-      data: {
-        editorId,
-        title,
-      },
-    });
-  };
-
-  const throttledSave = useCallback(throttle(saveEditor, 500), [editorId]);
-  const throttledSaveTitle = useCallback(throttle(saveTitle, 500), [editorId]);
-
   const handleChangeTitle = useCallback(
     (title: string) => {
-      setEditingState("title", title);
-      throttledSaveTitle(title);
+      broadcastTitle(title);
     },
-    [setEditingState, throttledSaveTitle]
+    [broadcastTitle]
   );
   const handleChangeValue = useCallback(
     (value: any, raw) => {
-      setEditingState("value", value);
+      broadcastValue(value);
       setEditorState(raw);
       prevRawState.current = value;
-      throttledSave(value);
     },
-    [setEditingState, throttledSave]
+    [broadcastValue]
   );
-
   return (
     <SyncEditor
       className={className}
@@ -113,23 +91,18 @@ const SyncEditorContainer: React.FC<Props> = ({
       onChangeTitle={handleChangeTitle}
       editorState={editorState}
       collaborators={collaborators}
-      editingTitle={editingTitle}
-      timestamp={timestamp}
+      editingTitle={title || ""}
+      timestamp={updatedAt}
     />
   );
 };
 
 const mapStateToProps = (state: AppState) => ({
-  editingTitle: selectors.selectEditingTitle(state),
-  editingValue: selectors.selectEditingValue(state),
   collaborators: selectors.selectCollaborators(state),
-  timestamp: selectors.selectTimeStamp(state),
   token: selectToken(state),
 });
 
 const mapDispatchToProps = {
-  detail: actions.crud.detail,
-  broadcast: actions.broadcast,
   unsubscribe: actions.unsubscribe,
   clearEditingValue: actions.clearEditingValue,
   setEditingState: actions.setEditingState,
@@ -143,4 +116,4 @@ const connector = connect(mapStateToProps, mapDispatchToProps);
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
-export default connector(SyncEditorContainer);
+export default connector(observer(SyncEditorContainer));

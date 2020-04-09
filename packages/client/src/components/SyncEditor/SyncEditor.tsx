@@ -1,6 +1,7 @@
 import React from "react";
 import cls from "classnames";
 import moment from "moment";
+import { observer } from "mobx-react";
 import RichTextEditor, { EditorValue } from "react-rte";
 import Collaborators from "./Collaborators";
 
@@ -63,4 +64,4 @@ const SyncEditor: React.FC<Props> = ({
   );
 };
 
-export default SyncEditor;
+export default observer(SyncEditor);

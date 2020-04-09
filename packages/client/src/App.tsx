@@ -3,6 +3,7 @@ import { Provider } from "react-redux";
 import Routes from "./routes";
 import configureStore from "./store/configureStore";
 import { hydrate } from "./modules/auth/action";
+import { MobxProvider, store as mobxStore } from "./modules/root";
 
 interface Props {}
 
@@ -13,7 +14,9 @@ store.dispatch(hydrate());
 const App: React.FC<Props> = () => {
   return (
     <Provider store={store}>
-      <Routes />
+      <MobxProvider value={mobxStore}>
+        <Routes />
+      </MobxProvider>
     </Provider>
   );
 };

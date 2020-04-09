@@ -20,3 +20,12 @@ export const tryCatch = (fn: Function) => async ({
     errorFn(e);
   }
 };
+
+export const confirmedAction = (
+  action: Function,
+  message = "Are you sure"
+) => () => {
+  // eslint-disable-next-line no-useless-return,no-restricted-globals,no-alert
+  if (!confirm(message)) return;
+  action();
+};
