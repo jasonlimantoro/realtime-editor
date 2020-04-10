@@ -16,6 +16,15 @@ const RootModel = types.model("RootModel", {
 export const store = RootModel.create();
 makeInspectable(store);
 addMiddleware(store, actionLogger);
+addMiddleware(store, (call, next, _abort) => {
+  if (call.type === "flow_throw") {
+    const code = call.args?.[0]?.response?.data?.code;
+    if (/(expire|revoke)/.test(code)) {
+      store.auth.logout(code);
+    }
+  }
+  next(call);
+});
 onSnapshot(store, (snapshot) => {
   // eslint-disable-next-line no-console
   console.log(snapshot);
