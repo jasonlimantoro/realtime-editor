@@ -1,6 +1,6 @@
 import { destroy, flow, getRoot, Instance, types } from "mobx-state-tree";
 import { values } from "mobx";
-import DraftModel, { IDraft } from "src/modules/draft/models/Draft.model";
+import DraftModel, { IDraft } from "src/modules/draft/models/draft.model";
 import moment from "moment";
 import { serviceRegistry } from "src/lib/services/registry";
 import isEmpty from "lodash/isEmpty";
@@ -8,7 +8,7 @@ import isEmpty from "lodash/isEmpty";
 const draftService = serviceRegistry.draft;
 
 const DraftListModel = types
-  .model("DraftList", {
+  .model("DraftListModel", {
     items: types.map(DraftModel),
   })
   .actions((self) => ({

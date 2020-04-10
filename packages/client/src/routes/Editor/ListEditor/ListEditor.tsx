@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useMst } from "src/modules/root";
-import { IDraft } from "src/modules/draft/models/Draft.model";
+import { IDraft } from "src/modules/draft/models/draft.model";
 import { observer } from "mobx-react";
 import EditorCard from "./EditorCard";
 

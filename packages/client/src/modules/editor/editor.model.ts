@@ -10,7 +10,7 @@ const Collaborator = types.model("collaborator", {
 });
 
 const EditorModel = types
-  .model({
+  .model("EditorModel", {
     title: "",
     value: "",
     updatedAt: "",

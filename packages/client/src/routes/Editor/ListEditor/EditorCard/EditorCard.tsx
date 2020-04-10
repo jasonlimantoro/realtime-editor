@@ -1,5 +1,5 @@
 import React from "react";
-import { IDraft } from "src/modules/draft/models/Draft.model";
+import { IDraft } from "src/modules/draft/models/draft.model";
 import { Link } from "react-router-dom";
 import moment from "moment";
 import { observer } from "mobx-react";

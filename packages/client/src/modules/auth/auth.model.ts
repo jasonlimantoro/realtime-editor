@@ -7,7 +7,7 @@ const service = serviceRegistry.auth;
 const storage = defaultStorage;
 
 const AuthModel = types
-  .model({
+  .model("AuthModel", {
     username: "",
     token: "",
     isLoggedIn: false,

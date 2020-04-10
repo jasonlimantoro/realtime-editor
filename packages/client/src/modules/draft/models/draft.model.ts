@@ -1,7 +1,7 @@
 import { types, getParent, Instance } from "mobx-state-tree";
 
 const DraftModel = types
-  .model("Draft", {
+  .model("DraftModel", {
     _id: types.identifier,
     title: types.string,
     value: "",

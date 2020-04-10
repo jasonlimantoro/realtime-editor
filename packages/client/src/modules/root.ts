@@ -1,9 +1,8 @@
 import { createContext, useContext } from "react";
 import { Instance, types, addMiddleware, onSnapshot } from "mobx-state-tree";
-import { actionLogger } from "mst-middlewares";
-import makeInspectable from "mobx-devtools-mst";
-import DraftListModel from "src/modules/draft/models/DraftList";
-import AuthModel from "src/modules/auth/Auth.model";
+import { connectReduxDevtools } from "mst-middlewares";
+import DraftListModel from "src/modules/draft/models/draftList.model";
+import AuthModel from "src/modules/auth/auth.model";
 import { defaultStorage } from "src/lib/storage";
 import EditorModel from "src/modules/editor/editor.model";
 
@@ -14,8 +13,12 @@ const RootModel = types.model("RootModel", {
 });
 
 export const store = RootModel.create();
-makeInspectable(store);
-addMiddleware(store, actionLogger);
+
+if (process.env.NODE_ENV === "development") {
+  // eslint-disable-next-line global-require,import/no-extraneous-dependencies
+  connectReduxDevtools(require("remotedev"), store, { logArgsNearName: false });
+}
+
 addMiddleware(store, (call, next, _abort) => {
   if (call.type === "flow_throw") {
     const code = call.args?.[0]?.response?.data?.code;

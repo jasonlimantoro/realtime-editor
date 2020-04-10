@@ -6,7 +6,6 @@ import {
   Switch,
 } from "react-router-dom";
 import { AuthGuard, GuestGuard } from "src/components/Guard";
-import Todos from "./Todos";
 import Editor from "./Editor";
 import ListEditor from "./Editor/ListEditor";
 import Login from "./Login";
@@ -18,7 +17,6 @@ const Index: React.FC<Props> = () => {
   return (
     <Router>
       <Switch>
-        <Route path="/todos" component={Todos} />
         <GuestGuard path="/login" component={Login} />
         <GuestGuard path="/register" component={Register} />
         <AuthGuard
