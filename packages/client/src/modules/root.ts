@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import { Instance, types, addMiddleware, onSnapshot } from "mobx-state-tree";
+import { Instance, types, addMiddleware } from "mobx-state-tree";
 import { connectReduxDevtools } from "mst-middlewares";
 import DraftListModel from "src/modules/draft/models/draftList.model";
 import AuthModel from "src/modules/auth/auth.model";
@@ -27,10 +27,6 @@ addMiddleware(store, (call, next, _abort) => {
     }
   }
   next(call);
-});
-onSnapshot(store, (snapshot) => {
-  // eslint-disable-next-line no-console
-  console.log(snapshot);
 });
 
 const currentCredential = defaultStorage.getCredentials();
