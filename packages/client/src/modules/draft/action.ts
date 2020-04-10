@@ -73,7 +73,7 @@ export const broadcast = ({
           type: DraftActionTypes.BROADCAST_VALUE,
           payload: data,
         });
-        service.broadcastState(data);
+        service.broadcastValue(data);
         break;
       case "title":
         dispatch<DraftAction>({
@@ -116,7 +116,7 @@ const subscribeEditingState = (
 });
 
 export const listenEditorStateChange = () => (dispatch: Dispatch) => {
-  service.listenState((data: any) => {
+  service.listenValue((data: any) => {
     dispatch(subscribeEditingState("value", data.value));
   });
   service.listenTitle((data: any) => {

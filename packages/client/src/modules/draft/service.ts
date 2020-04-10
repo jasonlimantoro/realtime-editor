@@ -34,10 +34,10 @@ export default class DraftService extends BaseService {
   broadcastTitle = (data: any) =>
     this.requestUtil.emit(this.CHANGE_TITLE, data);
 
-  broadcastState = (data: any) =>
+  broadcastValue = (data: any) =>
     this.requestUtil.emit(this.CHANGE_STATE, data);
 
-  listenState = (cb: any) =>
+  listenValue = (cb: any) =>
     this.requestUtil.listen(this.CHANGE_STATE_LISTENER, cb);
 
   unlistenState = () => this.requestUtil.unlisten(this.CHANGE_STATE_LISTENER);

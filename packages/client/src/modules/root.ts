@@ -5,10 +5,12 @@ import makeInspectable from "mobx-devtools-mst";
 import DraftListModel from "src/modules/draft/models/DraftList";
 import AuthModel from "src/modules/auth/Auth.model";
 import { defaultStorage } from "src/lib/storage";
+import EditorModel from "src/modules/editor/editor.model";
 
 const RootModel = types.model("RootModel", {
   drafts: types.optional(DraftListModel, {}),
   auth: types.optional(AuthModel, {}),
+  editor: types.optional(EditorModel, {}),
 });
 
 export const store = RootModel.create();

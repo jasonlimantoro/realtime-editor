@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react";
-import { IDraft } from "src/modules/draft/models/Draft.model";
+import { IEditor } from "src/modules/editor/editor.model";
 import { useMst } from "src/modules/root";
 import SyncEditor from "./SyncEditor";
 import { createEditorStateFromString } from "./utils";
@@ -13,12 +13,12 @@ interface Props {
 const SyncEditorContainer: React.FC<Props> = ({ editorId, className }) => {
   const {
     auth: { token },
-    drafts: { detailDraft, draftById },
+    drafts: { detailDraft },
+    editor,
   } = useMst();
   const {
-    broadcastTitle,
     title,
-    broadcastValue,
+    broadcast,
     value,
     updatedAt,
     listen,
@@ -26,7 +26,7 @@ const SyncEditorContainer: React.FC<Props> = ({ editorId, className }) => {
     allCollaborators,
     join,
     leave,
-  } = draftById(editorId) as IDraft;
+  } = editor as IEditor;
 
   const [editorState, setEditorState] = useState(
     createEditorStateFromString(value || "")
@@ -44,32 +44,38 @@ const SyncEditorContainer: React.FC<Props> = ({ editorId, className }) => {
 
   useEffect(() => {
     const payload = { room: editorId, meta: { token } };
-    join?.(payload);
+    join(payload);
     return () => {
-      leave?.(payload);
+      leave(payload);
     };
   }, [editorId, join, token, leave]);
 
   useEffect(() => {
-    listen?.();
+    listen();
     return () => {
-      unlisten?.();
+      unlisten();
     };
   }, [listen, unlisten]);
 
   const handleChangeTitle = useCallback(
     (title: string) => {
-      broadcastTitle(title);
+      broadcast("Title", {
+        title,
+        editorId,
+      });
     },
-    [broadcastTitle]
+    [broadcast, editorId]
   );
   const handleChangeValue = useCallback(
     (value: any, raw) => {
-      broadcastValue(value);
+      broadcast("Value", {
+        value,
+        editorId,
+      });
       setEditorState(raw);
       prevRawState.current = value;
     },
-    [broadcastValue]
+    [broadcast, editorId]
   );
   return (
     <SyncEditor

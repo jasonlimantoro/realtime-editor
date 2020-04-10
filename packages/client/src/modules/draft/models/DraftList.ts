@@ -1,4 +1,4 @@
-import { destroy, flow, Instance, types } from "mobx-state-tree";
+import { destroy, flow, getRoot, Instance, types } from "mobx-state-tree";
 import { values } from "mobx";
 import DraftModel, { IDraft } from "src/modules/draft/models/Draft.model";
 import moment from "moment";
@@ -29,7 +29,9 @@ const DraftListModel = types
     }),
     detailDraft: flow(function* D(id: string) {
       const { data } = yield draftService.detail(id);
-      self.items.set(data._id, data);
+      const root = getRoot(self) as any;
+      root.editor.setTitle(data.title);
+      root.editor.setValue(data.value);
     }),
   }))
   .views((self) => ({
@@ -45,9 +47,6 @@ const DraftListModel = types
     },
     get draftscount() {
       return values(self.items).length;
-    },
-    draftById(id: string) {
-      return self.items.get(id) || {};
     },
   }));
 export interface IDraftList extends Instance<typeof DraftListModel> {}
