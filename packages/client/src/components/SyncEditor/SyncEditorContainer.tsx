@@ -1,9 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { AppState } from "src/modules/types";
-import * as selectors from "src/modules/draft/selector";
 import { selectToken } from "src/modules/auth/selector";
-import * as actions from "src/modules/draft/action";
 import { observer } from "mobx-react";
 import { IDraft } from "src/modules/draft/models/Draft.model";
 import { useMst } from "src/modules/root";
@@ -18,21 +16,23 @@ interface Props extends PropsFromRedux {
 const SyncEditorContainer: React.FC<Props> = ({
   editorId,
   token,
-  join,
-  leave,
-  listenEditorStateChange,
-  listenCollaboratorChange,
-  clearEditingValue,
-  unsubscribe,
   className,
-  collaborators,
 }) => {
   const {
     drafts: { detailDraft, draftById },
   } = useMst();
-  const { broadcastTitle, title, broadcastValue, value, updatedAt } = draftById(
-    editorId
-  ) as IDraft;
+  const {
+    broadcastTitle,
+    title,
+    broadcastValue,
+    value,
+    updatedAt,
+    listen,
+    unlisten,
+    allCollaborators,
+    join,
+    leave,
+  } = draftById(editorId) as IDraft;
 
   const [editorState, setEditorState] = useState(
     createEditorStateFromString(value || "")
@@ -50,25 +50,18 @@ const SyncEditorContainer: React.FC<Props> = ({
 
   useEffect(() => {
     const payload = { room: editorId, meta: { token } };
-    join(payload);
+    join?.(payload);
     return () => {
-      leave(payload);
+      leave?.(payload);
     };
   }, [editorId, join, token, leave]);
 
   useEffect(() => {
-    listenEditorStateChange();
-    listenCollaboratorChange();
+    listen?.();
     return () => {
-      clearEditingValue();
-      unsubscribe();
+      unlisten?.();
     };
-  }, [
-    listenEditorStateChange,
-    unsubscribe,
-    clearEditingValue,
-    listenCollaboratorChange,
-  ]);
+  }, [listen, unlisten]);
 
   const handleChangeTitle = useCallback(
     (title: string) => {
@@ -90,7 +83,7 @@ const SyncEditorContainer: React.FC<Props> = ({
       onChangeValue={handleChangeValue}
       onChangeTitle={handleChangeTitle}
       editorState={editorState}
-      collaborators={collaborators}
+      collaborators={allCollaborators}
       editingTitle={title || ""}
       timestamp={updatedAt}
     />
@@ -98,19 +91,10 @@ const SyncEditorContainer: React.FC<Props> = ({
 };
 
 const mapStateToProps = (state: AppState) => ({
-  collaborators: selectors.selectCollaborators(state),
   token: selectToken(state),
 });
 
-const mapDispatchToProps = {
-  unsubscribe: actions.unsubscribe,
-  clearEditingValue: actions.clearEditingValue,
-  setEditingState: actions.setEditingState,
-  listenCollaboratorChange: actions.listenCollaboratorChange,
-  listenEditorStateChange: actions.listenEditorStateChange,
-  join: actions.join,
-  leave: actions.leave,
-};
+const mapDispatchToProps = {};
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
 
