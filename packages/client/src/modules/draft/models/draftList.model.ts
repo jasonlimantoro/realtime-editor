@@ -32,6 +32,7 @@ const DraftListModel = types
       const root = getRoot(self) as any;
       root.editor.setTitle(data.title);
       root.editor.setValue(data.value);
+      root.editor.setUpdatedAt(data.updatedAt);
     }),
   }))
   .views((self) => ({

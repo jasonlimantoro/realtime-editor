@@ -72,6 +72,9 @@ const EditorModel = types
     },
     leave(data: any) {
       service.leaveRoom(data);
+      self.title = "";
+      self.updatedAt = "";
+      self.value = "";
     },
   }))
   .views((self) => ({
