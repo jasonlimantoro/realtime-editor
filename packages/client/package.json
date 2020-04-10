@@ -87,6 +87,7 @@
     "postcss-preset-env": "^6.7.0",
     "postinstall-postinstall": "^2.0.0",
     "prettier": "^2.0.1",
+    "react-hot-loader": "^4.12.20",
     "redux-devtools-extension": "^2.13.8",
     "remotedev": "^0.2.9",
     "tailwindcss": "^1.2.0"

@@ -1,4 +1,6 @@
 import React from "react";
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { hot } from "react-hot-loader/root";
 import {
   BrowserRouter as Router,
   Route,
@@ -32,4 +34,4 @@ const Index: React.FC<Props> = () => {
   );
 };
 
-export default Index;
+export default hot(Index);
