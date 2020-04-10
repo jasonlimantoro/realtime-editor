@@ -1,24 +1,18 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { connect, ConnectedProps } from "react-redux";
-import { AppState } from "src/modules/types";
-import { selectToken } from "src/modules/auth/selector";
 import { observer } from "mobx-react";
 import { IDraft } from "src/modules/draft/models/Draft.model";
 import { useMst } from "src/modules/root";
 import SyncEditor from "./SyncEditor";
 import { createEditorStateFromString } from "./utils";
 
-interface Props extends PropsFromRedux {
+interface Props {
   editorId: string;
   className?: string;
 }
 
-const SyncEditorContainer: React.FC<Props> = ({
-  editorId,
-  token,
-  className,
-}) => {
+const SyncEditorContainer: React.FC<Props> = ({ editorId, className }) => {
   const {
+    auth: { token },
     drafts: { detailDraft, draftById },
   } = useMst();
   const {
@@ -90,14 +84,4 @@ const SyncEditorContainer: React.FC<Props> = ({
   );
 };
 
-const mapStateToProps = (state: AppState) => ({
-  token: selectToken(state),
-});
-
-const mapDispatchToProps = {};
-
-const connector = connect(mapStateToProps, mapDispatchToProps);
-
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
-export default connector(observer(SyncEditorContainer));
+export default observer(SyncEditorContainer);

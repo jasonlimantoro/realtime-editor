@@ -1,21 +1,16 @@
 import React, { useEffect } from "react";
-import { connect } from "react-redux";
 import { Link } from "react-router-dom";
-import { AppState } from "src/modules/types";
-import { logout } from "src/modules/auth/action";
-import { selectLoggedInUser } from "src/modules/auth/selector";
 import { useMst } from "src/modules/root";
 import { IDraft } from "src/modules/draft/models/Draft.model";
 import { observer } from "mobx-react";
 import EditorCard from "./EditorCard";
 
-interface ListEditorProps {}
+interface Props {}
 
-type Props = ListEditorProps & LinkMapDispatchProps & LinkMapStateProps;
-
-const ListEditor: React.FC<Props> = ({ logout, username }) => {
+const ListEditor: React.FC<Props> = () => {
   const {
     drafts: { fetchDrafts, draftsByDate, draftscount },
+    auth: { logout, username },
   } = useMst();
   useEffect(() => {
     fetchDrafts();
@@ -48,22 +43,4 @@ const ListEditor: React.FC<Props> = ({ logout, username }) => {
   );
 };
 
-interface LinkMapStateProps {
-  username: string;
-}
-
-interface LinkMapDispatchProps {
-  logout: () => void;
-}
-
-const mapStateToProps = (state: AppState): LinkMapStateProps => ({
-  username: selectLoggedInUser(state),
-});
-
-const mapDispatchToProps: LinkMapDispatchProps = {
-  logout,
-};
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(observer(ListEditor));
+export default observer(ListEditor);

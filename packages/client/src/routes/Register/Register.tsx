@@ -1,14 +1,13 @@
 import React from "react";
-import { connect } from "react-redux";
-import { register } from "src/modules/auth/action";
 import { Formik, Form, Field } from "formik";
-import { AppState } from "src/modules/types";
+import { useMst } from "src/modules/root";
 
-interface RegisterProps {}
+interface Props {}
 
-type Props = RegisterProps & LinkMapStateProps & LinkMapDispatchProps;
-
-const Register: React.FC<Props> = ({ register }) => {
+const Register: React.FC<Props> = () => {
+  const {
+    auth: { register },
+  } = useMst();
   return (
     <div>
       Register
@@ -36,16 +35,4 @@ const Register: React.FC<Props> = ({ register }) => {
   );
 };
 
-interface LinkMapStateProps {}
-
-interface LinkMapDispatchProps {
-  register: (username: string, password: string) => void;
-}
-
-const mapStateToProps = (state: AppState): LinkMapStateProps => ({});
-
-const mapDispatchToProps: LinkMapDispatchProps = {
-  register,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(Register);
+export default Register;

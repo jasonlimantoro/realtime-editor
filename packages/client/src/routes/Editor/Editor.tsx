@@ -1,16 +1,12 @@
 import React, { useEffect } from "react";
-import { connect } from "react-redux";
 import { useParams, Link } from "react-router-dom";
-import { AppState } from "src/modules/types";
-import { crud } from "src/modules/draft/action";
 import SyncEditorContainer from "src/components/SyncEditor/SyncEditorContainer";
 import { useMst } from "src/modules/root";
+import { observer } from "mobx-react";
 
-interface EditorProps {}
+interface Props {}
 
-type Props = EditorProps & LinkMapStateProps & LinkMapDispatchProps;
-
-const Editor: React.FC<Props> = ({ create }) => {
+const Editor: React.FC<Props> = () => {
   const { editorId } = useParams<{ editorId: string }>();
   const {
     drafts: { createDrafts },
@@ -30,15 +26,4 @@ const Editor: React.FC<Props> = ({ create }) => {
   );
 };
 
-interface LinkMapStateProps {}
-
-interface LinkMapDispatchProps {
-  create: (body: any) => void;
-}
-
-const mapStateToProps = (_state: AppState): LinkMapStateProps => ({});
-
-const mapDispatchToProps: LinkMapDispatchProps = {
-  create: crud.create,
-};
-export default connect(mapStateToProps, mapDispatchToProps)(Editor);
+export default observer(Editor);
