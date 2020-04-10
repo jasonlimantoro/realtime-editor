@@ -35,8 +35,8 @@ const EditorModel = types
 
     broadcast(field: "Title" | "Value", data: any) {
       Object(service)[`broadcast${field}`](data);
-      self[`set${field}`](data[field.toLowerCase()]);
     },
+
     listen() {
       service.listenValue((data: any) => {
         self.setValue(data.value);

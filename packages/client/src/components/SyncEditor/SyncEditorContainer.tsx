@@ -1,9 +1,13 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react";
 import { IEditor } from "src/modules/editor/editor.model";
+import throttle from "lodash/throttle";
 import { useMst } from "src/modules/root";
 import SyncEditor from "./SyncEditor";
 import { createEditorStateFromString } from "./utils";
+
+const DELAY = 1000;
+const stopper = throttle;
 
 interface Props {
   editorId: string;
@@ -19,6 +23,8 @@ const SyncEditorContainer: React.FC<Props> = ({ editorId, className }) => {
   const {
     title,
     broadcast,
+    setTitle,
+    setValue,
     value,
     updatedAt,
     listen,
@@ -27,6 +33,19 @@ const SyncEditorContainer: React.FC<Props> = ({ editorId, className }) => {
     join,
     leave,
   } = editor as IEditor;
+
+  const safeBroadcastTitle = useCallback(
+    stopper((title: string) => {
+      broadcast("Title", { editorId, title });
+    }, DELAY),
+    [editorId, broadcast]
+  );
+  const safeBroadcastValue = useCallback(
+    stopper((value: string) => {
+      broadcast("Value", { editorId, value });
+    }, DELAY),
+    [editorId, broadcast]
+  );
 
   const [editorState, setEditorState] = useState(
     createEditorStateFromString(value || "")
@@ -59,23 +78,19 @@ const SyncEditorContainer: React.FC<Props> = ({ editorId, className }) => {
 
   const handleChangeTitle = useCallback(
     (title: string) => {
-      broadcast("Title", {
-        title,
-        editorId,
-      });
+      setTitle(title);
+      safeBroadcastTitle(title);
     },
-    [broadcast, editorId]
+    [setTitle, safeBroadcastTitle]
   );
   const handleChangeValue = useCallback(
     (value: any, raw) => {
-      broadcast("Value", {
-        value,
-        editorId,
-      });
+      setValue(value);
+      safeBroadcastValue(value);
       setEditorState(raw);
       prevRawState.current = value;
     },
-    [broadcast, editorId]
+    [safeBroadcastValue, setValue]
   );
   return (
     <SyncEditor
