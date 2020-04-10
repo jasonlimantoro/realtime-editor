@@ -6,11 +6,18 @@ import AuthModel from "src/modules/auth/auth.model";
 import { defaultStorage } from "src/lib/storage";
 import EditorModel from "src/modules/editor/editor.model";
 
-const RootModel = types.model("RootModel", {
-  drafts: types.optional(DraftListModel, {}),
-  auth: types.optional(AuthModel, {}),
-  editor: types.optional(EditorModel, {}),
-});
+const RootModel = types
+  .model("RootModel", {
+    drafts: types.optional(DraftListModel, {}),
+    auth: types.optional(AuthModel, {}),
+    editor: types.optional(EditorModel, {}),
+    search: "",
+  })
+  .actions((self) => ({
+    setSearch(text: string) {
+      self.search = text;
+    },
+  }));
 
 export const store = RootModel.create();
 

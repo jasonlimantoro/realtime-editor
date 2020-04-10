@@ -38,17 +38,27 @@ const DraftListModel = types
   }))
   .views((self) => ({
     get draftsByDate() {
+      const { search } = getRoot(self) as any;
       return values(self.items).reduce((accum: any, current: any) => {
         const day = moment(Number(current._id)).format("YYYY-MM-DD");
-        return {
-          ...accum,
-          [day]:
-            accum[day]?.length > 0 ? accum[day].concat(current) : [current],
-        };
+        const match =
+          current.title.toLowerCase().indexOf(search.toLowerCase()) !== -1;
+        if (match) {
+          return {
+            ...accum,
+            [day]: accum[day]?.length ? accum[day].concat(current) : [current],
+          };
+        }
+        return accum;
       }, {});
     },
     get draftscount() {
-      return values(self.items).length;
+      return Object.values(this.draftsByDate).reduce<any>(
+        (accum: any, drafts: any) => {
+          return drafts.length + accum;
+        },
+        0
+      );
     },
   }));
 export interface IDraftList extends Instance<typeof DraftListModel> {}
