@@ -14,6 +14,7 @@ const DraftListModel = types
   .actions((self) => ({
     fetchDrafts: flow(function* F() {
       const { data } = yield draftService.list();
+      self.items.clear();
       data.forEach((d: any) => {
         self.items.set(d._id, d);
       });
