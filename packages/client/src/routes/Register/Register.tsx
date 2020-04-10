@@ -1,15 +1,23 @@
 import React from "react";
 import { Formik, Form, Field } from "formik";
 import { useMst } from "src/modules/root";
+import { observer } from "mobx-react";
+import { Link } from "react-router-dom";
 
 interface Props {}
 
 const Register: React.FC<Props> = () => {
   const {
-    auth: { register },
+    auth: { register, registerError, registerSuccess },
   } = useMst();
   return (
     <div>
+      {registerError && (
+        <p className="text-red-500">Register error: {registerError}</p>
+      )}
+      {registerSuccess && (
+        <p className="text-green-600">Registration success</p>
+      )}
       Register
       <Formik
         onSubmit={(values) => register(values.username, values.password)}
@@ -31,8 +39,11 @@ const Register: React.FC<Props> = () => {
           </button>
         </Form>
       </Formik>
+      <Link className="underline" to="/login">
+        Login
+      </Link>
     </div>
   );
 };
 
-export default Register;
+export default observer(Register);

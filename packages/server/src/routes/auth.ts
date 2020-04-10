@@ -14,8 +14,8 @@ router.post("/register", async (req, res, next) => {
       username: req.body.username,
       password: req.body.password,
     });
-    const result = await user.save();
-    res.json(result);
+    await user.save();
+    res.json({ username: req.body.username });
   } catch (e) {
     next(e);
   }
