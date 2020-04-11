@@ -1,4 +1,4 @@
-import BaseService from "src/lib/services/base";
+import { BaseService } from "rc-common";
 
 export default class AuthService extends BaseService {
   login = async (username: string, password: string) =>

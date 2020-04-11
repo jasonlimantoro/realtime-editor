@@ -1,13 +1,13 @@
 /* eslint-disable no-console */
-import RequestUtilService from "src/lib/services/request-util";
+import { RequestUtilService } from "rc-common";
 import io from "socket.io-client";
 
 const MAX_RECONNECTION_ATTEMPTS = 5;
 export default class DraftServiceUtil extends RequestUtilService {
   public socket: SocketIOClient.Socket;
 
-  constructor({ baseUrl = "", namespace = "" } = {}) {
-    super({ baseUrl, namespace });
+  constructor({ baseUrl = "", storageAuthKey = "cred" }) {
+    super({ baseUrl, storageAuthKey });
     this.socket = io.connect(baseUrl, {
       reconnectionAttempts: MAX_RECONNECTION_ATTEMPTS,
     });

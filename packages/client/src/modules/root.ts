@@ -36,7 +36,7 @@ addMiddleware(store, (call, next, _abort) => {
   next(call);
 });
 
-const currentCredential = defaultStorage.getCredentials();
+const currentCredential = defaultStorage.get();
 if (currentCredential) {
   store.auth.hydrate(currentCredential);
 }

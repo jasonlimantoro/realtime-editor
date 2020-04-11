@@ -1,4 +1,4 @@
-import BaseService from "src/lib/services/base";
+import { BaseService } from "rc-common";
 
 export default class DraftService extends BaseService {
   CHANGE_STATE = "CHANGE_STATE";

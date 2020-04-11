@@ -10,6 +10,7 @@ const build = (defaultConfig = config) => {
   const services = {
     draft: new DraftService({
       ...serviceConfig,
+      storageAuthKey: "cred",
       RequestUtil: DraftServiceUtil,
     }),
     auth: new AuthService(serviceConfig),

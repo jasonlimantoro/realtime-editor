@@ -29,7 +29,7 @@ const AuthModel = types
           username,
           password
         );
-        storage.saveCredentials(data.user);
+        storage.save(data.user);
         self.username = data.user.username;
         self.token = data.user.token;
         self.isLoggedIn = true;
@@ -42,7 +42,7 @@ const AuthModel = types
       self.token = "";
       self.isLoggedIn = false;
       self.logoutReason = reason;
-      storage.flushCredentials();
+      storage.flush();
     },
     register: flow(function* register(username: string, password: string) {
       self.registerError = "";
