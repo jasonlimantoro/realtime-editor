@@ -1,5 +1,5 @@
 import React from "react";
-import Guard from "src/components/Guard/Guard";
+import { Guard } from "rc-common";
 import { RouteProps } from "react-router-dom";
 import { useMst } from "src/modules/root";
 import { observer } from "mobx-react";
