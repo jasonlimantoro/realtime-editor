@@ -1,15 +1,13 @@
 import React from "react";
 import { Formik, Form, Field } from "formik";
-import { useMst } from "src/modules/root";
 import { observer } from "mobx-react";
 import { Link } from "react-router-dom";
+import { selectLoginData, useComposeAuth } from "src/modules/auth/hooks";
 
 interface Props {}
 
 const Login: React.FC<Props> = () => {
-  const {
-    auth: { login, logoutReason, loginError },
-  } = useMst();
+  const [{ login, logoutReason, loginError }] = useComposeAuth(selectLoginData);
   return (
     <div>
       {logoutReason && <p className="text-red-500">Reason: {logoutReason}</p>}

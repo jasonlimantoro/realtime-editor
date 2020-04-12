@@ -2,6 +2,11 @@ import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useMst } from "src/modules/root";
 import { IDraft } from "src/modules/draft/models/draft.model";
+import {
+  selectLogout,
+  selectUsername,
+  useComposeAuth,
+} from "src/modules/auth/hooks";
 import { observer } from "mobx-react";
 import EditorCard from "./EditorCard";
 
@@ -10,13 +15,14 @@ interface Props {}
 const ListEditor: React.FC<Props> = () => {
   const {
     drafts: { fetchDrafts, draftsByDate, draftscount },
-    auth: { logout, username },
     setSearch,
     search,
   } = useMst();
   useEffect(() => {
     fetchDrafts();
   }, [fetchDrafts]);
+
+  const [username, logout] = useComposeAuth(selectUsername, selectLogout);
 
   return (
     <div className="px-6">

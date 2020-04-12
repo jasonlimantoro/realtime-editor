@@ -1,15 +1,15 @@
 import React from "react";
 import { Formik, Form, Field } from "formik";
-import { useMst } from "src/modules/root";
 import { observer } from "mobx-react";
 import { Link } from "react-router-dom";
+import { selectRegisterData, useComposeAuth } from "src/modules/auth/hooks";
 
 interface Props {}
 
 const Register: React.FC<Props> = () => {
-  const {
-    auth: { register, registerError, registerSuccess },
-  } = useMst();
+  const [{ register, registerError, registerSuccess }] = useComposeAuth(
+    selectRegisterData
+  );
   return (
     <div>
       {registerError && (

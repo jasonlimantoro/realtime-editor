@@ -1,16 +1,13 @@
 import React from "react";
 import { Guard } from "rc-common";
 import { RouteProps } from "react-router-dom";
-import { useMst } from "src/modules/root";
 import { observer } from "mobx-react";
+import { selectIsLoggedIn, useComposeAuth } from "src/modules/auth/hooks";
 
 interface Props extends RouteProps {}
 
 const GuestGuard: React.FC<Props> = ({ ...rest }) => {
-  const {
-    auth: { isLoggedIn },
-  } = useMst();
-
+  const [isLoggedIn] = useComposeAuth(selectIsLoggedIn);
   return <Guard protect={isLoggedIn} to="/editors" {...rest} />;
 };
 

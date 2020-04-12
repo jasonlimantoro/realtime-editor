@@ -3,6 +3,7 @@ import { observer } from "mobx-react";
 import { IEditor } from "src/modules/editor/editor.model";
 import throttle from "lodash/throttle";
 import { useMst } from "src/modules/root";
+import { selectToken, useComposeAuth } from "src/modules/auth/hooks";
 import SyncEditor from "./SyncEditor";
 import { createEditorStateFromString } from "./utils";
 
@@ -16,7 +17,6 @@ interface Props {
 
 const SyncEditorContainer: React.FC<Props> = ({ editorId, className }) => {
   const {
-    auth: { token },
     drafts: { detailDraft },
     editor,
   } = useMst();
@@ -33,6 +33,7 @@ const SyncEditorContainer: React.FC<Props> = ({ editorId, className }) => {
     join,
     leave,
   } = editor as IEditor;
+  const [token] = useComposeAuth(selectToken);
 
   const safeBroadcastTitle = useCallback(
     stopper((title: string) => {
