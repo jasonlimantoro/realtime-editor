@@ -1,4 +1,4 @@
-import { BaseService } from "rc-common";
+import { BaseService } from "react-common-util";
 
 export default class AuthService extends BaseService {
   login = async (username: string, password: string) =>

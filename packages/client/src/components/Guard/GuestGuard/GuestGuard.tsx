@@ -1,5 +1,5 @@
 import React from "react";
-import { Guard } from "rc-common";
+import { Guard } from "react-common-util";
 import { RouteProps } from "react-router-dom";
 import { observer } from "mobx-react";
 import { selectIsLoggedIn, useComposeAuth } from "src/modules/auth/hooks";

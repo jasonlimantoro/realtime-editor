@@ -1,6 +1,7 @@
-import { BaseService } from "rc-common";
+import { BaseService } from "react-common-util";
+import DraftServiceUtil from "src/modules/draft/request-util";
 
-export default class DraftService extends BaseService {
+export default class DraftService extends BaseService<DraftServiceUtil> {
   CHANGE_STATE = "CHANGE_STATE";
 
   CHANGE_STATE_LISTENER = "CHANGE_STATE_LISTENER";

@@ -1,13 +1,14 @@
 /* eslint-disable no-console */
-import { RequestUtilService } from "rc-common";
+import { RequestUtilService } from "react-common-util";
 import io from "socket.io-client";
+import { defaultStorage } from "src/lib/storage";
 
 const MAX_RECONNECTION_ATTEMPTS = 5;
 export default class DraftServiceUtil extends RequestUtilService {
   public socket: SocketIOClient.Socket;
 
-  constructor({ baseUrl = "", storageAuthKey = "cred" }) {
-    super({ baseUrl, storageAuthKey });
+  constructor({ baseUrl = "" }) {
+    super({ baseUrl });
     this.socket = io.connect(baseUrl, {
       reconnectionAttempts: MAX_RECONNECTION_ATTEMPTS,
     });
@@ -25,6 +26,18 @@ export default class DraftServiceUtil extends RequestUtilService {
       console.groupEnd();
     });
   }
+
+  getConfig = () => {
+    const credentials = defaultStorage.get();
+    if (credentials && credentials.token) {
+      return {
+        headers: {
+          Authorization: `Bearer ${credentials.token}`,
+        },
+      };
+    }
+    return {};
+  };
 
   emit = async (event: string, data: any) => {
     this.socket.emit(event, data);
