@@ -11,7 +11,7 @@ interface UserSchema extends Document {
 
 interface UserVirtual extends UserSchema {
   token: string;
-  comparePassword: (plaintext: string) => boolean;
+  comparePassword: (plaintext: string) => Promise<boolean>;
 }
 interface UserModel extends Model<UserVirtual> {}
 
