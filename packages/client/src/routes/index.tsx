@@ -4,7 +4,6 @@ import {
   Route,
   Redirect,
   Switch,
-  Link,
 } from "react-router-dom";
 import { AuthGuard, GuestGuard } from "src/components/Guard";
 import Editor from "./Editor";
@@ -27,16 +26,7 @@ const Index: React.FC<Props> = () => {
         />
         <AuthGuard path="/editors" component={ListEditor} />
         <AuthGuard path="/editor/:editorId" component={Editor} />
-        <Route
-          render={() => (
-            <div>
-              Not Found
-              <div>
-                Go to <Link to="/login">Login</Link>
-              </div>
-            </div>
-          )}
-        />
+        <Route render={() => <Redirect to="/login" />} />
       </Switch>
     </Router>
   );
