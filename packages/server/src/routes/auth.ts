@@ -26,13 +26,13 @@ router.post("/login", async (req, res, next) => {
     const user = await User.findOne({ username: req.body.username });
     if (!user) {
       return res.status(401).json({
-        message: "Username invalid",
+        message: "Invalid credentials",
       });
     }
     const authenticated = await user.comparePassword(req.body.password);
     if (!authenticated) {
       return res.status(401).json({
-        message: "Password invalid",
+        message: "Invalid credentials",
       });
     }
     const { password: _password, _id, ...userData } = user.toObject({
