@@ -40,3 +40,7 @@ h2 {
 h3 {
   @apply text-xl;
 }
+
+a {
+  @apply text-indigo-600 underline cursor-pointer;
+}
