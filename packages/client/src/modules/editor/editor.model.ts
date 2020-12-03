@@ -1,4 +1,4 @@
-import { getRoot, Instance, types } from "mobx-state-tree";
+import { getRoot, Instance, types, applySnapshot } from "mobx-state-tree";
 import { serviceRegistry } from "src/lib/services/registry";
 import { keys } from "mobx";
 
@@ -72,9 +72,7 @@ const EditorModel = types
     },
     leave(data: any) {
       service.leaveRoom(data);
-      self.title = "";
-      self.updatedAt = "";
-      self.value = "";
+      applySnapshot(self, {});
     },
   }))
   .views((self) => ({
