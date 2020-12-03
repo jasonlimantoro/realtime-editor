@@ -61,7 +61,7 @@ const Login: React.FC<Props> = () => {
               <div className="mb-4">
                 <button
                   type="submit"
-                  className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  className="group relative w-full flex justify-center btn btn-indigo"
                 >
                   <span className="absolute left-0 inset-y-0 flex items-center pl-3">
                     <svg
@@ -90,26 +90,49 @@ const Login: React.FC<Props> = () => {
                   Register
                 </Link>
               </div>
-              <div className="text-gray-800 mt-8 absolute">
-                <div className="flex items-center">
-                  <h3>Test Account</h3>
+              <div className="grid grid-cols-2 col-gap-4 text-gray-800 mt-8">
+                <div>
+                  <div className="mb-2">
+                    <h3>Test Account 1</h3>
+                    <p>
+                      Username: <b>admin</b>{" "}
+                    </p>
+                    <p>
+                      Password: <b>admin</b>{" "}
+                    </p>
+                  </div>
                   <button
                     type="button"
                     onClick={() => {
                       setFieldValue("username", "admin");
                       setFieldValue("password", "admin");
                     }}
-                    className="ml-8 py-1 px-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    className="btn btn-indigo"
                   >
-                    Use This
+                    Use this
                   </button>
                 </div>
-                <p>
-                  Username: <b>admin</b>{" "}
-                </p>
-                <p>
-                  Password: <b>admin</b>{" "}
-                </p>
+                <div>
+                  <div className="mb-2">
+                    <h3>Test Account 2</h3>
+                    <p>
+                      Username: <b>admin2</b>{" "}
+                    </p>
+                    <p>
+                      Password: <b>admin2</b>{" "}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFieldValue("username", "admin2");
+                      setFieldValue("password", "admin2");
+                    }}
+                    className="btn btn-indigo"
+                  >
+                    Use this
+                  </button>
+                </div>
               </div>
             </Form>
           )}
