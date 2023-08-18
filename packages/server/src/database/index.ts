@@ -2,11 +2,7 @@ import mongoose from "mongoose";
 
 const url = process.env.MONGODB_URL || "mongodb://127.0.0.1:27017/editor";
 
-mongoose.connect(url, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useFindAndModify: false,
-});
+mongoose.connect(url);
 
 const db = mongoose.connection;
 

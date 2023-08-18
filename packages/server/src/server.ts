@@ -8,7 +8,7 @@ import "express-async-errors";
 import "./database";
 import { errorHandler } from "./lib/middleware";
 
-const port = process.env.PORT || 4000;
+const port = process.env.PORT || "8080";
 
 const app = express();
 const server = http.createServer(app);
